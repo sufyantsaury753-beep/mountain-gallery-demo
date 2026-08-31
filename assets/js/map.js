@@ -1,6 +1,6 @@
 /**
- * MOUNTAIN GALLERY - MAP LOGIC (Cloud-Synced with Fallback)
- * Interactive Leaflet Map connected with Supabase CloudDB & local data.js
+ * MOUNTAIN GALLERY DEMO - MAP LOGIC (100% Standalone)
+ * Interactive Leaflet Map with 21 Mountains across West, Central, and East Java.
  */
 
 let map;
@@ -55,28 +55,37 @@ const luxuryIcon = L.divIcon({
     </div>
   `,
   className: "",
-  iconSize: [48, 60],
-  iconAnchor: [24, 60],
-  popupAnchor: [0, -60]
+  iconSize: [46, 58],
+  iconAnchor: [23, 58],
+  popupAnchor: [0, -58]
 });
 
-async function initMap() {
+function resolveAssetPath(src) {
+  if (!src) return "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400";
+  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:")) {
+    return src;
+  }
+  return src;
+}
+
+function initMap() {
   const mapBounds = [
-    [-8.80, 105.00],
-    [-5.00, 115.00]
+    [-9.50, 104.50],
+    [-5.00, 115.50]
   ];
 
+  // View encompassing West, Central, and East Java
   map = L.map("map", {
     maxBounds: mapBounds,
     maxBoundsViscosity: 0.8,
     minZoom: 6,
     maxZoom: 16,
     zoomControl: true
-  }).setView([-7.12, 108.35], 8);
+  }).setView([-7.45, 110.15], 7);
 
   activeLayer = mapLayers.street.addTo(map);
 
-  await loadAndRenderMountains();
+  loadAndRenderMountains();
   setupFilters();
 
   setTimeout(() => {
@@ -84,11 +93,9 @@ async function initMap() {
   }, 350);
 }
 
-async function loadAndRenderMountains() {
-  if (typeof CloudDB !== "undefined") {
-    cachedMountains = await CloudDB.getAllMountains();
-  } else if (typeof LIST_GUNUNG !== "undefined") {
-    cachedMountains = LIST_GUNUNG;
+function loadAndRenderMountains() {
+  if (typeof DATA_GUNUNG !== "undefined") {
+    cachedMountains = Object.values(DATA_GUNUNG);
   } else {
     cachedMountains = [];
   }
@@ -108,114 +115,59 @@ function setBasemap(type) {
 }
 
 function buatPopupHtml(gunung) {
-  const rawCover = gunung.cover || gunung.coverFallback || "assets/img/gunung-cikuray.jpg";
-  const coverImg = resolveAssetPath(rawCover);
+  const coverImg = resolveAssetPath(gunung.cover);
   const galleryUrl = `galeri/index.html?id=${gunung.id}`;
 
   return `
     <div class="lux-popup-card">
-      <div class="lux-popup-thumb" onclick="togglePopupAtribusi(this)">
-        <img src="${coverImg}" alt="${gunung.nama}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'">
+      <div class="lux-popup-thumb">
+        <img src="${coverImg}" alt="${gunung.nama}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400'">
         <div class="lux-popup-badge">
           <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
-          ${gunung.mdplText}
+          ${gunung.mdplText || (gunung.mdpl ? `${gunung.mdpl.toLocaleString()} Mdpl` : "")}
         </div>
-      </div>
-      <div class="lux-popup-attribution">
-        <strong>Atribusi:</strong> ${gunung.atribusi}
       </div>
       <div class="lux-popup-body">
-        <div class="lux-popup-title">${gunung.nama}</div>
+        <h4 class="lux-popup-title">${gunung.nama}</h4>
         <div class="lux-popup-loc">
           <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-          ${gunung.lokasi}
+          ${gunung.lokasi || gunung.region}
         </div>
-        <a class="popup-gallery-btn" href="${galleryUrl}">
-          Buka Galeri
-          <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M5 12H19M19 12L12 5M19 12L12 19"/></svg></span>
+        <a href="${galleryUrl}" class="popup-gallery-btn">
+          <span>Buka Galeri &amp; Detail</span>
+          <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </a>
       </div>
     </div>
   `;
 }
 
-function togglePopupAtribusi(el) {
-  const card = el.closest(".lux-popup-card");
-  const attr = card.querySelector(".lux-popup-attribution");
-  if (attr) attr.classList.toggle("show");
-}
-
 function renderMarkers() {
   markers.forEach(m => map.removeLayer(m));
   markers = [];
 
-  cachedMountains.forEach((gunung) => {
-    if (currentFilterRegion !== "all" && !gunung.region.toLowerCase().includes(currentFilterRegion.toLowerCase())) {
-      return;
-    }
-    if (currentFilterElevation > 0 && gunung.mdpl < currentFilterElevation) {
-      return;
-    }
+  const filtered = cachedMountains.filter(g => {
+    const region = (g.region || g.lokasi || "").toLowerCase();
+    let matchesRegion = true;
+    if (currentFilterRegion === "jabar") matchesRegion = region.includes("jawa barat") || region.includes("jabar");
+    else if (currentFilterRegion === "jateng") matchesRegion = region.includes("jawa tengah") || region.includes("jateng") || region.includes("diy") || region.includes("yogyakarta");
+    else if (currentFilterRegion === "jatim") matchesRegion = region.includes("jawa timur") || region.includes("jatim");
 
-    const popupContent = buatPopupHtml(gunung);
-    const marker = L.marker([gunung.lat, gunung.lng], { icon: luxuryIcon })
-      .addTo(map)
-      .bindPopup(popupContent, {
-        closeButton: true,
-        autoClose: true,
-        closeOnClick: false,
-        maxWidth: 260
-      });
+    return matchesRegion;
+  });
 
-    marker.on("click", () => {
-      fokusGunung(gunung, marker);
+  filtered.forEach(gunung => {
+    if (!gunung.lat || !gunung.lng) return;
+
+    const marker = L.marker([gunung.lat, gunung.lng], { icon: luxuryIcon });
+    marker.bindPopup(buatPopupHtml(gunung), {
+      maxWidth: 270,
+      className: "custom-lux-popup"
     });
 
-    marker.gunungData = gunung;
+    marker.addTo(map);
     markers.push(marker);
   });
-}
-
-function fokusGunung(gunung, targetMarker) {
-  map.closePopup();
-  map.flyTo([gunung.lat, gunung.lng], 11, {
-    duration: 1.2,
-    easeLinearity: 0.25
-  });
-
-  setTimeout(() => {
-    if (targetMarker) {
-      targetMarker.openPopup();
-    } else {
-      const found = markers.find(m => m.gunungData && m.gunungData.id === gunung.id);
-      if (found) found.openPopup();
-    }
-  }, 1250);
-}
-
-function selectMountainFromMenu(mountainId) {
-  const dropdown = document.getElementById("siteDropdown");
-  if (dropdown) dropdown.classList.remove("active");
-
-  const gunung = cachedMountains.find(m => m.id === mountainId || m.slug === mountainId);
-  if (gunung) {
-    if (currentFilterRegion !== "all" || currentFilterElevation > 0) {
-      currentFilterRegion = "all";
-      currentFilterElevation = 0;
-      document.querySelectorAll(".filter-chip").forEach(c => {
-        c.classList.toggle("active", c.dataset.filter === "all");
-      });
-      renderMarkers();
-    }
-
-    const mapSection = document.querySelector(".map-section");
-    if (mapSection) {
-      mapSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    const marker = markers.find(m => m.gunungData && (m.gunungData.id === gunung.id || m.gunungData.slug === gunung.slug));
-    fokusGunung(gunung, marker);
-  }
 }
 
 function setupFilters() {
@@ -223,84 +175,80 @@ function setupFilters() {
     chip.addEventListener("click", () => {
       document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
-
-      const filterType = chip.dataset.filter;
-      if (filterType === "all") {
-        currentFilterRegion = "all";
-        currentFilterElevation = 0;
-      } else if (filterType === "jabar") {
-        currentFilterRegion = "Jawa Barat";
-        currentFilterElevation = 0;
-      } else if (filterType === "jateng") {
-        currentFilterRegion = "Jawa Tengah";
-        currentFilterElevation = 0;
-      }
-
+      currentFilterRegion = chip.dataset.filter;
       renderMarkers();
     });
   });
 }
 
 function setupDrawerMenu() {
-  const mountainDropdownList = document.getElementById("dropdownMountainList");
-  const countSub = document.getElementById("dropdownMountainCountSubtitle");
-  if (countSub && cachedMountains) {
-    countSub.textContent = `${cachedMountains.length} Destinasi Gunung Terdaftar`;
+  const container = document.getElementById("dropdownMountainList");
+  const subtitle = document.getElementById("dropdownMountainCountSubtitle");
+  if (subtitle) {
+    subtitle.textContent = `${cachedMountains.length} Destinasi Gunung Terdaftar`;
   }
+  if (!container) return;
 
-  if (mountainDropdownList) {
-    mountainDropdownList.innerHTML = cachedMountains.map(g => `
-      <button type="button" class="dropdown-mountain-item" onclick="selectMountainFromMenu('${g.id}')">
-        <strong>
-          <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
-          ${g.nama}
-        </strong>
-        <span>${g.mdplText || (g.mdpl ? `${g.mdpl.toLocaleString()} Mdpl` : '')}</span>
-      </button>
-    `).join("");
-  }
+  container.innerHTML = cachedMountains.map(g => `
+    <a class="dropdown-mountain-item" href="galeri/index.html?id=${g.id}">
+      <img src="${resolveAssetPath(g.cover)}" alt="${g.nama}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=100'">
+      <div class="dropdown-mountain-item-info">
+        <strong>${g.nama}</strong>
+        <small>${g.region} · ${g.mdplText || (g.mdpl ? `${g.mdpl.toLocaleString()} Mdpl` : "")}</small>
+      </div>
+    </a>
+  `).join("");
 }
 
-function toggleMenu(event) {
-  if (event) event.stopPropagation();
+function toggleMenu(e) {
+  if (e) e.stopPropagation();
   const dropdown = document.getElementById("siteDropdown");
-  if (dropdown) dropdown.classList.toggle("active");
+  if (dropdown) {
+    dropdown.classList.toggle("active");
+    dropdown.classList.toggle("open");
+  }
 }
 
-function toggleMountainList(event) {
-  if (event) event.stopPropagation();
+function toggleMountainList(e) {
+  if (e) e.stopPropagation();
   const list = document.getElementById("dropdownMountainList");
-  if (list) list.classList.toggle("active");
+  if (list) {
+    list.classList.toggle("active");
+    list.classList.toggle("open");
+  }
 }
 
-function openAboutModal(event) {
-  if (event) event.stopPropagation();
-  const dropdown = document.getElementById("siteDropdown");
-  if (dropdown) dropdown.classList.remove("active");
+function openAboutModal(e) {
+  if (e) e.stopPropagation();
   const modal = document.getElementById("aboutModal");
-  if (modal) modal.classList.add("active");
+  if (modal) {
+    modal.classList.add("active");
+    modal.classList.add("open");
+  }
+  const dropdown = document.getElementById("siteDropdown");
+  if (dropdown) {
+    dropdown.classList.remove("active");
+    dropdown.classList.remove("open");
+  }
 }
 
 function closeAboutModal() {
   const modal = document.getElementById("aboutModal");
-  if (modal) modal.classList.remove("active");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.classList.remove("open");
+  }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  initMap();
-
-  document.addEventListener("click", (e) => {
-    const dropdown = document.getElementById("siteDropdown");
-    const menuBtn = document.querySelector(".menu-trigger-btn");
-    if (dropdown && !dropdown.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("siteDropdown");
+  const trigger = document.querySelector(".menu-trigger-btn");
+  if (dropdown && (dropdown.classList.contains("active") || dropdown.classList.contains("open"))) {
+    if (!dropdown.contains(e.target) && (!trigger || !trigger.contains(e.target))) {
       dropdown.classList.remove("active");
+      dropdown.classList.remove("open");
     }
-  });
-
-  const aboutModal = document.getElementById("aboutModal");
-  if (aboutModal) {
-    aboutModal.addEventListener("click", (e) => {
-      if (e.target === aboutModal) closeAboutModal();
-    });
   }
 });
+
+document.addEventListener("DOMContentLoaded", initMap);
