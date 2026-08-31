@@ -24,15 +24,24 @@
       <h2 class="login-title">Mountain Gallery</h2>
       <p class="login-subtitle">Masuk ke Portal Cloud CMS &amp; Database</p>
 
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:12px 14px; margin-bottom:18px; font-size:12.5px; color:#1e40af; text-align:left;">
+        <strong>🔑 Akses Akun Demo:</strong>
+        <div style="margin-top:4px; font-family:monospace; font-size:13px;">
+          • Username: <b>admin</b><br>
+          • Password: <b>admin</b>
+        </div>
+        <small style="color:#64748b; display:block; margin-top:6px;">(Bisa langsung klik tombol "Masuk ke Dashboard" di bawah)</small>
+      </div>
+
       <form id="formLogin">
         <div class="form-group">
           <label for="loginUser">Username</label>
-          <input type="text" id="loginUser" class="form-control" placeholder="Masukkan username" value="" autocomplete="off" required>
+          <input type="text" id="loginUser" class="form-control" placeholder="Masukkan username" value="admin" autocomplete="off" required>
         </div>
 
         <div class="form-group">
           <label for="loginPass">Password</label>
-          <input type="password" id="loginPass" class="form-control" placeholder="Masukkan password" value="" autocomplete="off" required>
+          <input type="password" id="loginPass" class="form-control" placeholder="Masukkan password" value="admin" autocomplete="off" required>
         </div>
 
         <button type="submit" class="btn-login">
@@ -524,10 +533,7 @@
   <!-- =========================================================
        SCRIPTS (SUPABASE JS SDK & CLOUD DB ENGINE)
        ========================================================= -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../assets/js/data.js"></script>
-  <script src="../assets/js/config.js"></script>
-  <script src="../assets/js/cloud-db.js"></script>
   <script src="../assets/js/admin.js"></script>
 </body>
 </html>
