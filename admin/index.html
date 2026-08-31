@@ -1,17 +1,57 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard Demo - Mountain Gallery CMS</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Mountain Gallery Cloud</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Custom Stylesheets -->
-  <link rel="stylesheet" href="../assets/css/main.css" />
-  <link rel="stylesheet" href="../assets/css/admin.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
-
 <body>
-  <div class="admin-container active" style="display:flex;">
+
+  <!-- =========================================================
+       1. AUTH / LOGIN SCREEN
+       ========================================================= -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/><path d="M9 8L11 11H7.5L9 8Z"/></svg></span>
+      </div>
+      <h2 class="login-title">Mountain Gallery</h2>
+      <p class="login-subtitle">Masuk ke Portal Cloud CMS &amp; Database</p>
+
+      <form id="formLogin">
+        <div class="form-group">
+          <label for="loginUser">Username</label>
+          <input type="text" id="loginUser" class="form-control" placeholder="Masukkan username" value="" autocomplete="off" required>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPass">Password</label>
+          <input type="password" id="loginPass" class="form-control" placeholder="Masukkan password" value="" autocomplete="off" required>
+        </div>
+
+        <button type="submit" class="btn-login">
+          Masuk ke Dashboard
+        </button>
+      </form>
+
+      <a href="../index.html" class="back-to-site">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></span>
+        Kembali ke Website
+      </a>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       2. ADMIN DASHBOARD CONTAINER
+       ========================================================= -->
+  <div class="admin-container" id="adminContainer">
+    
     <!-- Topbar -->
     <header class="admin-topbar">
       <div class="admin-brand">
@@ -19,20 +59,26 @@
           <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
         </div>
         <div class="admin-brand-text">
-          <h1>Mountain Gallery <span class="badge-admin" style="background:#dcfce7; color:#15803d; border-color:#bbf7d0;">Demo Mode</span></h1>
+          <h1>Mountain Gallery <span class="badge-admin">Cloud CMS</span></h1>
           <p>Portal Manajemen Data &amp; Media Dokumentasi</p>
         </div>
       </div>
 
       <div class="admin-topbar-actions">
-        <div class="cloud-status-pill cloud-status-connected">
-          <span class="status-dot"></span> Demo Interaktif Aktif
+        <!-- Cloud Status Badge -->
+        <div class="cloud-status-pill cloud-status-connected" id="cloudConnectionBadge">
+          <span class="status-dot"></span> Memeriksa Status...
         </div>
 
-        <a href="../index.html" class="btn-admin btn-admin-outline">
+        <a href="../index.html" target="_blank" class="btn-admin btn-admin-outline">
           <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
-          Lihat Web Peta
+          Lihat Web Live
         </a>
+
+        <button type="button" class="btn-admin btn-admin-danger" onclick="handleLogout()">
+          <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+          Logout
+        </button>
       </div>
     </header>
 
@@ -44,27 +90,24 @@
       </button>
       <button type="button" class="admin-tab-btn" data-tab="mountains" onclick="switchTab('mountains', this)">
         <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
-        Destinasi Gunung (21)
+        Destinasi Gunung
       </button>
       <button type="button" class="admin-tab-btn" data-tab="media" onclick="switchTab('media', this)">
         <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
-        Upload &amp; Media
+        Galeri &amp; Media Cloud
       </button>
       <button type="button" class="admin-tab-btn" data-tab="settings" onclick="switchTab('settings', this)">
         <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-        Reset / Pengaturan
+        Pengaturan Cloud &amp; Database
       </button>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Content Body -->
     <main class="admin-main">
-      <!-- Info Box -->
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; align-items:center; gap:10px; font-size:12.5px; color:#1e40af;">
-        <span style="font-size:18px;">💡</span>
-        <span><strong>Interactive Demo:</strong> Anda dapat mencoba fitur Tambah Gunung, Edit Rute, dan Upload Dokumen secara bebas. Perubahan tersimpan langsung di browser Anda tanpa perlu server luar!</span>
-      </div>
-
-      <!-- TAB 1: OVERVIEW -->
+      
+      <!-- =========================================================
+           TAB 1: OVERVIEW
+           ========================================================= -->
       <section class="tab-content-pane" id="tabPane-overview" style="display:block;">
         <div class="kpi-grid">
           <div class="kpi-card">
@@ -73,7 +116,7 @@
             </div>
             <div class="kpi-info">
               <span>Total Destinasi</span>
-              <h3 id="kpiTotalMountains">21</h3>
+              <h3 id="kpiTotalMountains">0</h3>
             </div>
           </div>
 
@@ -82,8 +125,8 @@
               <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
             </div>
             <div class="kpi-info">
-              <span>Media &amp; Dokumentasi</span>
-              <h3 id="kpiTotalMedia">35</h3>
+              <span>Media &amp; Foto Cloud</span>
+              <h3 id="kpiTotalMedia">0</h3>
             </div>
           </div>
 
@@ -93,15 +136,15 @@
             </div>
             <div class="kpi-info">
               <span>Jalur Pendakian</span>
-              <h3 id="kpiTotalRoutes">48</h3>
+              <h3 id="kpiTotalRoutes">0</h3>
             </div>
           </div>
         </div>
 
         <div class="section-header">
           <div>
-            <h2>Destinasi Gunung Terdaftar (21 Gunung)</h2>
-            <p>Daftar lengkap destinasi gunung di Jawa Barat, Jawa Tengah, dan Jawa Timur.</p>
+            <h2>Destinasi Gunung Terkini</h2>
+            <p>Daftar gunung yang terdaftar di database Supabase Cloud.</p>
           </div>
           <button type="button" class="btn-admin btn-admin-primary" onclick="openAddMountainModal()">
             <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
@@ -109,12 +152,14 @@
           </button>
         </div>
 
-        <div class="mountain-table-container" style="padding: 12px 18px;">
+        <div class="mountain-table-container" style="padding: 16px 20px;">
           <div id="recentMountainsList"></div>
         </div>
       </section>
 
-      <!-- TAB 2: MOUNTAINS TABLE -->
+      <!-- =========================================================
+           TAB 2: DESTINASI GUNUNG
+           ========================================================= -->
       <section class="tab-content-pane" id="tabPane-mountains" style="display:none;">
         <div class="section-header">
           <div>
@@ -129,7 +174,7 @@
 
         <div class="mountain-table-container">
           <div class="table-search-bar">
-            <input type="text" id="mountainSearchInput" class="form-control table-search-input" placeholder="🔍 Cari nama gunung, region, atau ketinggian..." oninput="handleSearchMountain(this.value)">
+            <input type="text" id="mountainSearchInput" class="form-control table-search-input" placeholder="🔍 Cari nama gunung atau lokasi...">
           </div>
 
           <div style="overflow-x:auto;">
@@ -150,12 +195,14 @@
         </div>
       </section>
 
-      <!-- TAB 3: MEDIA -->
+      <!-- =========================================================
+           TAB 3: GALERI & MEDIA CLOUD
+           ========================================================= -->
       <section class="tab-content-pane" id="tabPane-media" style="display:none;">
         <div class="section-header">
           <div>
-            <h2 id="currentMountainMediaTitle">Galeri Media Dokumentasi</h2>
-            <p>Kelola foto dan video dokumentasi untuk tiap destinasi gunung.</p>
+            <h2 id="currentMountainMediaTitle">Galeri Media Cloud</h2>
+            <p>Upload foto/video beresolusi tinggi langsung ke Cloudflare R2 / Supabase Storage.</p>
           </div>
           <div style="display:flex; gap:10px; align-items:center;">
             <select id="mediaMountainSelect" class="form-control" style="width:auto; min-width:220px;" onchange="handleMediaMountainChange(event)"></select>
@@ -169,152 +216,318 @@
         <div class="media-grid" id="mediaGridContainer"></div>
       </section>
 
-      <!-- TAB 4: SETTINGS / RESET -->
+      <!-- =========================================================
+           TAB 4: PENGATURAN CLOUD & DATABASE
+           ========================================================= -->
       <section class="tab-content-pane" id="tabPane-settings" style="display:none;">
         <div class="section-header">
           <div>
-            <h2>Pengaturan Showcase Demo</h2>
-            <p>Kelola reset memori browser dan informasi project.</p>
+            <h2>Pengaturan Cloud &amp; Database</h2>
+            <p>Konfigurasi koneksi API Supabase PostgreSQL, Storage, dan Kredensial Admin.</p>
           </div>
         </div>
 
-        <div style="background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:24px; max-width:600px;">
-          <h3 style="font-size:16px; font-weight:800; margin-bottom:8px;">Reset Data ke Default (21 Gunung)</h3>
-          <p style="font-size:13px; color:var(--admin-muted); margin-bottom:16px;">Jika Anda telah mencoba menambah/menghapus data dan ingin mengembalikan 21 gunung awal (Jabar, Jateng, Jatim), klik tombol di bawah:</p>
-          <button type="button" class="btn-admin btn-admin-danger" onclick="handleResetDemoData()">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>
-            Reset ke Data Awal (21 Gunung)
-          </button>
+        <div class="grid-2-col" style="margin-bottom: 24px;">
+          
+          <!-- Cloud Config Card -->
+          <div class="kpi-card" style="flex-direction:column; align-items:stretch; gap:16px;">
+            <div>
+              <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">Koneksi Supabase Cloud</h3>
+              <p style="font-size:12px; color:var(--admin-muted);">Dapatkan URL &amp; Anon Key di Supabase ➔ Project Settings ➔ API.</p>
+            </div>
+
+            <form id="formCloudConfig">
+              <div class="form-group">
+                <label>Supabase Project URL</label>
+                <input type="text" id="cfgSupabaseUrl" class="form-control" placeholder="https://xyzabcdef.supabase.co" required>
+              </div>
+
+              <div class="form-group">
+                <label>Supabase Anon Public Key</label>
+                <input type="password" id="cfgSupabaseKey" class="form-control" placeholder="eyJhbGciOi..." required>
+              </div>
+
+              <div class="form-group">
+                <label>Cloudflare R2 / Storage Public URL (Opsional)</label>
+                <input type="text" id="cfgR2Url" class="form-control" placeholder="https://pub-xyz.r2.dev atau kosongkan jika pakai Supabase Storage">
+              </div>
+
+              <button type="submit" class="btn-admin btn-admin-primary" style="width:100%; justify-content:center; margin-top:8px;">
+                Simpan Konfigurasi Cloud
+              </button>
+            </form>
+          </div>
+
+          <!-- 1-Click Seeder & Tools Card -->
+          <div class="kpi-card" style="flex-direction:column; align-items:stretch; gap:16px;">
+            <div>
+              <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">1-Click Database Seeder</h3>
+              <p style="font-size:12px; color:var(--admin-muted);">Unggah 5 data gunung bawaan (Cikuray, Papandayan, Sagara, Slamet, Tampomas) ke Supabase Cloud secara otomatis.</p>
+            </div>
+
+            <div style="background:#f1f5f9; padding:16px; border-radius:12px; border:1px solid #e2e8f0;">
+              <p style="font-size:12px; color:#475569; line-height:1.5; margin-bottom:12px;">
+                Fitur ini akan menyalin seluruh data jalur, foto, dan spesifikasi dari file lokal ke database cloud PostgreSQL Anda secara instan.
+              </p>
+              <button type="button" class="btn-admin btn-admin-primary" style="width:100%; justify-content:center;" onclick="handleSeedDatabase()">
+                ⚡ Unggah Data Bawaan ke Supabase
+              </button>
+              <div id="seedProgressBox" style="display:none; margin-top:10px; font-size:11.5px; font-weight:700; color:#2563eb; background:#eff6ff; padding:8px 12px; border-radius:8px;"></div>
+            </div>
+
+            <div style="border-top:1px solid var(--admin-border); padding-top:16px;">
+              <h3 style="font-size:15px; font-weight:800; margin-bottom:10px;">Ubah Password Admin</h3>
+              <form id="formChangePassword">
+                <div class="form-group">
+                  <label>Password Lama</label>
+                  <input type="password" id="oldPasswordInput" class="form-control" placeholder="Password saat ini" required>
+                </div>
+                <div class="form-group">
+                  <label>Username Baru (Opsional)</label>
+                  <input type="text" id="newUsernameInput" class="form-control" placeholder="Username baru">
+                </div>
+                <div class="form-group">
+                  <label>Password Baru</label>
+                  <input type="password" id="newPasswordInput" class="form-control" placeholder="Password baru" required>
+                </div>
+                <button type="submit" class="btn-admin btn-admin-outline" style="width:100%; justify-content:center;">
+                  Perbarui Kredensial
+                </button>
+              </form>
+            </div>
+
+          </div>
+
         </div>
       </section>
+
     </main>
+  </div>
 
-    <!-- Modal Tambah / Edit Gunung -->
-    <div class="admin-modal-backdrop" id="mountainModal">
-      <div class="admin-modal-card">
-        <div class="admin-modal-header">
-          <h3 id="mountainModalTitle">Tambah Destinasi Gunung</h3>
-          <button type="button" class="btn-icon" onclick="closeMountainModal()">&times;</button>
-        </div>
-        <form onsubmit="handleSaveMountain(event)">
-          <div class="admin-modal-body">
-            <input type="hidden" id="formMountainId">
-            <div class="grid-2-col">
-              <div class="form-group">
-                <label>Nama Gunung *</label>
-                <input type="text" id="formMountainNama" class="form-control" required placeholder="Contoh: Gunung Gede">
-              </div>
-              <div class="form-group">
-                <label>Region / Wilayah *</label>
-                <select id="formMountainRegion" class="form-control" required>
-                  <option value="Jawa Barat">Jawa Barat</option>
-                  <option value="Jawa Tengah">Jawa Tengah</option>
-                  <option value="Jawa Timur">Jawa Timur</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid-2-col">
-              <div class="form-group">
-                <label>Ketinggian (MDPL) *</label>
-                <input type="number" id="formMountainMdpl" class="form-control" required placeholder="2958">
-              </div>
-              <div class="form-group">
-                <label>Lokasi Kabupaten / Daerah *</label>
-                <input type="text" id="formMountainLokasi" class="form-control" required placeholder="Cianjur / Sukabumi">
-              </div>
-            </div>
-
-            <div class="grid-2-col">
-              <div class="form-group">
-                <label>Latitude (Titik Koordinat Peta) *</label>
-                <input type="number" step="any" id="formMountainLat" class="form-control" required placeholder="-6.7833">
-              </div>
-              <div class="form-group">
-                <label>Longitude *</label>
-                <input type="number" step="any" id="formMountainLng" class="form-control" required placeholder="106.9833">
-              </div>
-            </div>
-
-            <div class="grid-2-col">
-              <div class="form-group">
-                <label>Tingkat Kesulitan</label>
-                <input type="text" id="formMountainKesulitan" class="form-control" placeholder="Sedang / Menantang">
-              </div>
-              <div class="form-group">
-                <label>Estimasi Waktu Pendakian</label>
-                <input type="text" id="formMountainWaktu" class="form-control" placeholder="6 - 8 Jam">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Foto Cover (URL Gambar Unsplash / Cloud)</label>
-              <input type="url" id="formMountainCover" class="form-control" placeholder="https://images.unsplash.com/photo-...">
-            </div>
-
-            <div class="form-group">
-              <label>Deskripsi Lengkap Gunung</label>
-              <textarea id="formMountainDesc" class="form-control" rows="3" placeholder="Tuliskan daya tarik dan sejarah singkat..."></textarea>
-            </div>
-          </div>
-          <div class="admin-modal-footer">
-            <button type="button" class="btn-admin btn-admin-outline" onclick="closeMountainModal()">Batal</button>
-            <button type="submit" class="btn-admin btn-admin-primary">Simpan Gunung</button>
-          </div>
-        </form>
+  <!-- =========================================================
+       MODAL 1: ADD / EDIT MOUNTAIN
+       ========================================================= -->
+  <div class="admin-modal-backdrop" id="modalMountain">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 id="modalMountainTitle">Tambah Destinasi Gunung</h3>
+        <button type="button" class="btn-icon" onclick="closeMountainModal()" aria-label="Tutup">✕</button>
       </div>
-    </div>
 
-    <!-- Modal Tambah Dokumen Media -->
-    <div class="admin-modal-backdrop" id="mediaModal">
-      <div class="admin-modal-card">
-        <div class="admin-modal-header">
-          <h3>Upload Foto / Video Dokumentasi</h3>
-          <button type="button" class="btn-icon" onclick="closeMediaModal()">&times;</button>
-        </div>
-        <form onsubmit="handleSaveMedia(event)">
-          <div class="admin-modal-body">
+      <form id="formMountain">
+        <div class="admin-modal-body">
+          <input type="hidden" id="mountainIdInput">
+
+          <div class="grid-2-col">
             <div class="form-group">
-              <label>Destinasi Gunung Terpilih *</label>
-              <select id="formMediaTargetMountain" class="form-control" required></select>
+              <label>Nama Gunung</label>
+              <input type="text" id="mNama" class="form-control" placeholder="cth: Gunung Cikuray" required>
             </div>
-
             <div class="form-group">
-              <label>Tipe Media *</label>
-              <select id="formMediaType" class="form-control">
-                <option value="image">Foto (Image)</option>
-                <option value="video">Video</option>
+              <label>Ketinggian (MDPL)</label>
+              <input type="number" id="mMdpl" class="form-control" placeholder="cth: 2821" required>
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label>Lokasi / Kabupaten</label>
+              <input type="text" id="mLokasi" class="form-control" placeholder="cth: Garut, Jawa Barat" required>
+            </div>
+            <div class="form-group">
+              <label>Region / Wilayah</label>
+              <select id="mRegion" class="form-control">
+                <option value="Jawa Barat">Jawa Barat</option>
+                <option value="Jawa Tengah">Jawa Tengah</option>
+                <option value="Jawa Timur">Jawa Timur</option>
+                <option value="Luar Jawa">Luar Jawa</option>
               </select>
             </div>
+          </div>
 
+          <div class="grid-2-col">
             <div class="form-group">
-              <label>URL Gambar / Media *</label>
-              <input type="url" id="formMediaSrc" class="form-control" required placeholder="https://images.unsplash.com/photo-...">
+              <label>Latitude (Titik Peta)</label>
+              <input type="text" inputmode="decimal" id="mLat" class="form-control" placeholder="cth: -7.2270" required>
             </div>
-
             <div class="form-group">
-              <label>Judul Dokumentasi</label>
-              <input type="text" id="formMediaTitle" class="form-control" placeholder="Sunrise Puncak / Suasana Pos 3">
-            </div>
-
-            <div class="form-group">
-              <label>Keterangan / Deskripsi Foto</label>
-              <input type="text" id="formMediaDesc" class="form-control" placeholder="Momen indah di atas awan...">
+              <label>Longitude (Titik Peta)</label>
+              <input type="text" inputmode="decimal" id="mLng" class="form-control" placeholder="cth: 107.9040" required>
             </div>
           </div>
-          <div class="admin-modal-footer">
-            <button type="button" class="btn-admin btn-admin-outline" onclick="closeMediaModal()">Batal</button>
-            <button type="submit" class="btn-admin btn-admin-primary">Simpan Media</button>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label>Tingkat Kesulitan Medan</label>
+              <select id="mKesulitan" class="form-control">
+                <option value="Mudah">Mudah</option>
+                <option value="Menengah">Menengah</option>
+                <option value="Menantang">Menantang</option>
+                <option value="Ekstrem">Ekstrem</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Estimasi Waktu Tempuh</label>
+              <input type="text" id="mEstimasi" class="form-control" placeholder="cth: 6 - 8 Jam">
+            </div>
           </div>
-        </form>
-      </div>
+
+          <div class="form-group">
+            <label>Suhu Puncak</label>
+            <input type="text" id="mSuhu" class="form-control" placeholder="cth: 8°C - 14°C (atau 14°C - 19°C)">
+          </div>
+
+          <!-- Cover Image Upload Area -->
+          <div class="form-group" style="margin-top:8px;">
+            <label style="font-weight:800; color:var(--admin-primary); display:flex; align-items:center; gap:6px;">
+              <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+              Foto Cover Utama Gunung
+            </label>
+
+            <!-- Dropzone Cover -->
+            <label class="dropzone" for="mCoverFileInput" style="padding:16px 20px; cursor:pointer; margin-bottom:10px;">
+              <input type="file" id="mCoverFileInput" accept="image/*" style="display:none;">
+              <div class="dropzone-icon" style="width:40px; height:40px; margin-bottom:8px;">
+                <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              </div>
+              <h4 style="font-size:13.5px; margin-bottom:4px;">Klik untuk Pilih Foto Cover (Galeri HP / Laptop)</h4>
+              <p style="font-size:11.5px;">Otomatis dikompresi ke WebP HD &amp; diunggah ke Cloud Storage</p>
+            </label>
+
+            <!-- Live Cover Preview Box -->
+            <div id="mCoverPreviewBox" style="display:none; position:relative; margin-bottom:12px; border-radius:12px; overflow:hidden; border:1.5px solid var(--admin-border); background:#0f172a; max-height:200px;">
+              <img id="mCoverPreviewImg" src="" alt="Cover Preview" style="width:100%; height:200px; object-fit:cover; display:block;">
+              <button type="button" class="btn-admin" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.75); color:#fff; border:none; padding:6px 12px; font-size:11px; border-radius:8px;" onclick="document.getElementById('mCoverFileInput').click()">
+                📷 Ganti Foto Cover
+              </button>
+            </div>
+
+            <!-- Fallback URL Input -->
+            <input type="text" id="mCover" class="form-control" placeholder="Atau masukkan link gambar luar (Opsional, cth: https://images.unsplash.com/...)" style="font-size:12px;">
+          </div>
+
+          <div class="form-group">
+            <label>Atribusi Hak Cipta Foto</label>
+            <input type="text" id="mAtribusi" class="form-control" placeholder="cth: Foto oleh John Doe, Wikimedia Commons, CC BY-SA 4.0">
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi Lengkap</label>
+            <textarea id="mDeskripsi" class="form-control" rows="3" placeholder="Deskripsi karakter gunung, keindahan panorama, dan medan..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi Tambahan / Catatan Suasana</label>
+            <textarea id="mDeskripsiTambahan" class="form-control" rows="2" placeholder="Catatan ekstra suasana pendakian..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Tags / Label (Pisahkan koma)</label>
+            <input type="text" id="mTags" class="form-control" placeholder="cth: Jawa Barat, Garut, Sunrise Spot, Samudra Awan">
+          </div>
+
+          <!-- Routes Section -->
+          <div style="border-top:1px solid var(--admin-border); padding-top:16px; margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <label style="font-weight:800; font-size:12px;">JALUR PENDAKIAN</label>
+              <button type="button" class="btn-admin btn-admin-outline" style="padding:4px 10px; font-size:11.5px;" onclick="addRouteRow()">
+                + Tambah Jalur
+              </button>
+            </div>
+            <div id="routesRepeaterContainer"></div>
+          </div>
+
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-outline" onclick="closeMountainModal()">Batal</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Simpan ke Database Cloud</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <div id="toastBox" class="toast-box"></div>
+  <!-- =========================================================
+       MODAL 2: ADD / UPLOAD MEDIA (BULK & MULTI-PHOTO SUPPORT)
+       ========================================================= -->
+  <div class="admin-modal-backdrop" id="modalAddMedia">
+    <div class="admin-modal-card" style="max-width:560px;">
+      <div class="admin-modal-header">
+        <h3 id="modalMediaHeaderTitle">Upload Dokumen (Foto / Video) ke Cloud</h3>
+        <button type="button" class="btn-icon" onclick="closeAddMediaModal()" aria-label="Tutup">✕</button>
+      </div>
 
-  <!-- Application Logic -->
+      <form id="formAddMedia">
+        <div class="admin-modal-body">
+          
+          <label class="dropzone" for="mediaFileInput">
+            <input type="file" id="mediaFileInput" accept="image/*,video/*,video/mp4,video/webm,video/quicktime" multiple style="display:none;">
+            <div class="dropzone-icon">
+              <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+            </div>
+            <h4>Klik untuk Pilih Dokumen (Foto / Video)</h4>
+            <p>Mendukung foto (JPG, PNG, WebP) &amp; video (MP4, WebM, MOV). Bisa pilih banyak file sekaligus!</p>
+          </label>
+
+          <div id="uploadStatusText" style="display:none; font-size:12px; font-weight:700; padding:10px 14px; border-radius:8px; margin-bottom:12px; border:1px solid transparent;"></div>
+
+          <div id="uploadProgressBarContainer" style="display:none; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:var(--admin-primary); margin-bottom:4px;">
+              <span id="uploadProgressLabel">Mengunggah Dokumen...</span>
+              <span id="uploadProgressPct">0%</span>
+            </div>
+            <div style="background:#e2e8f0; border-radius:999px; height:8px; overflow:hidden;">
+              <div id="uploadProgressBar" style="background:var(--admin-primary); width:0%; height:100%; transition:width 0.25s ease;"></div>
+            </div>
+          </div>
+
+          <!-- Thumbnail Grid Preview untuk Multi-Files -->
+          <div id="mediaMultiPreviewGrid" style="display:none; grid-template-columns:repeat(auto-fill, minmax(56px, 1fr)); gap:6px; max-height:130px; overflow-y:auto; padding:8px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:14px;"></div>
+
+          <div class="form-group">
+            <label>Judul Dokumen (Opsional)</label>
+            <input type="text" id="mediaTitleInput" class="form-control" placeholder="Biarkan kosong untuk judul otomatis sesuai nama gunung">
+            <small style="font-size:11px; color:var(--admin-muted); display:block; margin-top:4px;">
+              Jika dikosongkan, judul otomatis seragam menjadi <em>[Nama Gunung]</em> (cth: <em>Gunung Sagara</em>).
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi Dokumen (Opsional)</label>
+            <textarea id="mediaDescInput" class="form-control" rows="2" placeholder="Biarkan kosong untuk deskripsi otomatis (Dokumentasi [Nama Gunung])"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Atau Masukkan URL File / Video Langsung (Opsional)</label>
+            <input type="text" id="mediaSrcUrlInput" class="form-control" placeholder="https://images.unsplash.com/... atau https://...mp4">
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+            <input type="checkbox" id="mediaIsCoverCheckbox" style="width:16px; height:16px; cursor:pointer;">
+            <label for="mediaIsCoverCheckbox" style="font-size:12.5px; font-weight:700; cursor:pointer; color:var(--admin-text);">
+              Jadikan dokumen pertama sebagai Cover Utama Gunung
+            </label>
+          </div>
+
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-outline" onclick="closeAddMediaModal()">Batal</button>
+          <button type="submit" id="btnSubmitMedia" class="btn-admin btn-admin-primary">
+            Upload &amp; Simpan Dokumen
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       SCRIPTS (SUPABASE JS SDK & CLOUD DB ENGINE)
+       ========================================================= -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/cloud-db.js"></script>
   <script src="../assets/js/admin.js"></script>
 </body>
 </html>

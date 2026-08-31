@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mountain Gallery Demo - Peta &amp; Eksplorasi 21 Gunung Indonesia</title>
+  <title>Mountain Gallery - Peta &amp; Eksplorasi Gunung Indonesia</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,7 +36,7 @@
         </div>
         <div class="brand-info">
           <h1>Mountain Gallery</h1>
-          <p>Eksplorasi 21 Puncak &amp; Jalur Pendakian Pulau Jawa</p>
+          <p>Eksplorasi Puncak &amp; Jalur Pendakian Indonesia</p>
         </div>
       </a>
 
@@ -52,7 +52,7 @@
         <div class="dropdown-header">
           <div>
             <strong>Navigasi Menu</strong>
-            <small>Mountain Gallery Showcase</small>
+            <small>Mountain Gallery System</small>
           </div>
           <button type="button" class="dropdown-close-btn" onclick="toggleMenu(event)" aria-label="Tutup Menu">
             <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
@@ -66,7 +66,7 @@
           </span>
           <div>
             <strong>Beranda Peta</strong>
-            <small>Kembali ke peta interaktif 21 gunung</small>
+            <small>Kembali ke peta interaktif</small>
           </div>
         </a>
 
@@ -77,7 +77,7 @@
           </span>
           <div>
             <strong>Pilih Destinasi Gunung</strong>
-            <small id="dropdownMountainCountSubtitle">21 Destinasi Gunung Terdaftar</small>
+            <small id="dropdownMountainCountSubtitle">Destinasi Gunung Terdaftar</small>
           </div>
         </button>
 
@@ -91,18 +91,18 @@
           </span>
           <div>
             <strong>Tentang Website</strong>
-            <small>Fitur &amp; Informasi Project</small>
+            <small>Informasi &amp; Arsitektur Project</small>
           </div>
         </button>
 
-        <!-- Menu 4: Demo Admin CMS -->
+        <!-- Menu 4: Login Admin -->
         <a class="dropdown-item" href="admin/index.html">
           <span class="menu-icon-box" style="background: linear-gradient(135deg, #833ab4, #e1306c); color:#ffffff;">
             <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
           </span>
           <div>
-            <strong style="color: #c13584;">Demo Admin CMS</strong>
-            <small>Uji coba kelola data gunung &amp; upload</small>
+            <strong style="color: #c13584;">Login Admin</strong>
+            <small>Kelola data gunung &amp; galeri cloud</small>
           </div>
         </a>
       </div>
@@ -112,23 +112,19 @@
     <main class="map-section">
       <!-- Controls Bar (Filters & Basemap) -->
       <div class="map-controls-bar">
-        <!-- Filter Chips: Semua Gunung, Jawa Barat, Jawa Tengah, Jawa Timur -->
+        <!-- Filter Chips: Semua Gunung, Jawa Barat, Jawa Tengah -->
         <div class="filter-chips">
           <button type="button" class="filter-chip active" data-filter="all">
             <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>
-            Semua (21)
+            Semua Gunung
           </button>
           <button type="button" class="filter-chip" data-filter="jabar">
             <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            Jabar (10)
+            Jawa Barat
           </button>
           <button type="button" class="filter-chip" data-filter="jateng">
             <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            Jateng (6)
-          </button>
-          <button type="button" class="filter-chip" data-filter="jatim">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            Jatim (5)
+            Jawa Tengah
           </button>
         </div>
 
@@ -157,8 +153,8 @@
 
     <!-- Site Footer -->
     <footer class="site-footer">
-      <div>© 2026 <strong>Mountain Gallery Demo</strong> · 21 Gunung Pilihan Pulau Jawa.</div>
-      <div>Pilih pin pada peta atau gunakan menu navigasi untuk melihat detail &amp; galeri.</div>
+      <div>© 2026 <strong>Mountain Gallery</strong> · Didesain untuk pecinta alam &amp; petualang.</div>
+      <div>Pilih pin pada peta atau gunakan menu di pojok kanan atas untuk membuka galeri.</div>
     </footer>
   </div>
 
@@ -175,10 +171,10 @@
 
       <h2>Mountain Gallery</h2>
       <p>
-        <strong>Mountain Gallery</strong> adalah platform galeri interaktif berbasis peta digital yang mendokumentasikan keindahan alam, jalur pendakian, dan arsip momen berharga di 21 gunung di Pulau Jawa (Jawa Barat, Jawa Tengah, dan Jawa Timur).
+        <strong>Mountain Gallery</strong> adalah platform galeri interaktif berbasis peta digital yang mendokumentasikan keindahan alam, jalur pendakian, dan arsip momen berharga di berbagai puncak gunung di Indonesia.
       </p>
       <p>
-        Dilengkapi sistem multi-layer basemap, galeri foto &amp; video HD, dan panel Admin CMS mandiri yang bisa diuji coba secara langsung.
+        Setiap destinasi dilengkapi foto beresolusi tinggi, cuplikan video dokumentasi, informasi ketinggian mdpl, estimasi waktu tempuh, dan tingkat kesulitan medan pendakian.
       </p>
 
       <button type="button" class="modal-action-btn" onclick="closeAboutModal()">
@@ -190,8 +186,11 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Application Logic -->
+  <!-- Supabase Cloud Engine & Fallback Logic -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/data.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/cloud-db.js"></script>
   <script src="assets/js/map.js"></script>
 </body>
 </html>

@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Galeri &amp; Jalur Pendakian - Mountain Gallery Demo</title>
+  <title>Detail Galeri - Mountain Gallery</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Custom Stylesheets -->
   <link rel="stylesheet" href="../assets/css/main.css" />
@@ -16,133 +21,277 @@
     <header class="topbar">
       <a class="brand-wrapper" href="../index.html">
         <div class="brand-logo">
-          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Mountain Icon" role="img">
+            <defs>
+              <linearGradient id="igLogoGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#833AB4"/>
+                <stop offset="35%" stop-color="#C13584"/>
+                <stop offset="70%" stop-color="#F56040"/>
+                <stop offset="100%" stop-color="#FCAF45"/>
+              </linearGradient>
+            </defs>
             <rect x="6" y="6" width="52" height="52" rx="16" fill="#ffffff"/>
-            <path d="M14 44L28 22L36 34L43 27L51 44" fill="none" stroke="url(#igLogoGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 44L28 22L36 34L43 27L51 44" fill="none" stroke="url(#igLogoGrad2)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M22 44H51" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
             <circle cx="46" cy="18" r="4" fill="#FCAF45"/>
           </svg>
         </div>
         <div class="brand-info">
           <h1>Mountain Gallery</h1>
-          <p>Galeri Dokumentasi &amp; Peta Wisata</p>
+          <p id="navMountainName">Dokumentasi &amp; Arsip Pendakian</p>
         </div>
       </a>
 
       <div class="topbar-actions">
-        <a href="../index.html" class="btn-back-map" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:999px; background:rgba(255,255,255,0.9); color:var(--text-main); font-size:12.5px; font-weight:800; text-decoration:none; border:1px solid #e2e8f0;">
-          <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></span>
+        <a class="nav-btn desktop-only" href="../index.html">
+          <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></span>
           Kembali ke Peta
         </a>
-        <button type="button" class="menu-trigger-btn" onclick="toggleMenu(event)" aria-label="Menu">
+        <button type="button" class="menu-trigger-btn" onclick="toggleMenu(event)" aria-label="Buka Menu">
           <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
         </button>
       </div>
-
-      <!-- Drawer Dropdown Menu -->
-      <div class="site-dropdown" id="siteDropdown">
-        <div class="dropdown-header">
-          <div>
-            <strong>Navigasi Menu</strong>
-            <small>Pilih 21 Destinasi Gunung</small>
-          </div>
-          <button type="button" class="dropdown-close-btn" onclick="toggleMenu(event)" aria-label="Tutup">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
-          </button>
-        </div>
-
-        <a class="dropdown-item" href="../index.html">
-          <span class="menu-icon-box">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 11L12 4L21 11M5 10V20H10V14H14V20H19V10"/></svg></span>
-          </span>
-          <div>
-            <strong>Beranda Peta Interaktif</strong>
-            <small>Eksplorasi peta GIS pulau Jawa</small>
-          </div>
-        </a>
-
-        <button type="button" class="dropdown-item" onclick="toggleMountainList(event)">
-          <span class="menu-icon-box">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
-          </span>
-          <div>
-            <strong>Daftar 21 Gunung</strong>
-            <small>Pindah ke halaman galeri lain</small>
-          </div>
-        </button>
-
-        <div class="dropdown-mountain-list" id="dropdownMountainList"></div>
-
-        <a class="dropdown-item" href="../admin/index.html">
-          <span class="menu-icon-box" style="background:linear-gradient(135deg, #833ab4, #e1306c); color:#fff;">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-          </span>
-          <div>
-            <strong style="color:#c13584;">Demo Admin CMS</strong>
-            <small>Kelola data &amp; upload foto</small>
-          </div>
-        </a>
-      </div>
     </header>
 
-    <!-- Hero Banner -->
-    <section class="gallery-hero" id="heroBanner">
-      <div class="gallery-hero-content">
-        <div class="gallery-hero-badge" id="mountainMdplBadge">2.958 Mdpl</div>
-        <h1 class="gallery-hero-title" id="mountainName">Gunung Gede</h1>
-        <p class="gallery-hero-location" id="mountainLocation"></p>
-        <p class="gallery-hero-desc" id="mountainDesc"></p>
-      </div>
-    </section>
+    <!-- Main Mountain Gallery Content -->
+    <main class="gallery-page">
+      <!-- Hero Cover & Info Section -->
+      <section class="mountain-hero">
+        <article class="hero-cover-card" onclick="toggleCoverAttribution()">
+          <img id="heroCoverImg" src="" alt="Cover Gunung">
+          
+          <button type="button" class="attribution-toggle-pill" onclick="event.stopPropagation(); toggleCoverAttribution()">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+            Hak Cipta Foto
+          </button>
 
-    <!-- Main Detail Content -->
-    <main class="gallery-main-container">
-      <!-- Technical Stats Bar -->
-      <section class="tech-stats-grid" id="techStatsContainer"></section>
+          <div class="hero-attribution-box" id="heroAttributionBox">
+            <strong>Atribusi Foto:</strong> <span id="heroAttributionText"></span>
+          </div>
 
-      <!-- Hiking Routes Section -->
-      <section class="routes-section">
-        <h2 class="section-title">
-          <span class="svg-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-          Jalur &amp; Rute Pendakian Resmi
-        </h2>
-        <div class="routes-grid" id="routesListContainer"></div>
+          <div class="hero-cover-info">
+            <div class="hero-badge">
+              <span id="heroLocationTag"></span>
+            </div>
+            <h2 id="heroTitle">Nama Gunung</h2>
+          </div>
+        </article>
+
+        <article class="mountain-info-card">
+          <div>
+            <div class="info-header">
+              <div class="location-tag" id="infoLocationTag"></div>
+            </div>
+            <h2 class="mountain-title-gradient" id="infoTitle">Nama Gunung</h2>
+            <p class="mountain-desc" id="mountainDescription" style="margin-top:12px;"></p>
+            <p class="mountain-desc" id="mountainDescriptionExtra" style="margin-top:8px;"></p>
+          </div>
+
+          <!-- Specs Matrix -->
+          <div class="specs-matrix">
+            <div class="spec-item">
+              <div class="spec-item-icon">
+                <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
+              </div>
+              <small>Ketinggian</small>
+              <strong id="specElevation">2.821 Mdpl</strong>
+            </div>
+            <div class="spec-item">
+              <div class="spec-item-icon">
+                <span class="svg-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+              </div>
+              <small>Tingkat Kesulitan</small>
+              <strong id="specDifficulty">Menantang</strong>
+            </div>
+            <div class="spec-item">
+              <div class="spec-item-icon">
+                <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+              </div>
+              <small>Estimasi Waktu</small>
+              <strong id="specDuration">6 - 8 Jam</strong>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="tags-container" id="tagsContainer"></div>
+        </article>
       </section>
 
-      <!-- Media Gallery Section -->
-      <section class="media-section">
-        <div class="media-section-header">
-          <h2 class="section-title">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
-            Galeri Dokumentasi Puncak &amp; Trek
-          </h2>
+      <!-- Hiking Routes Section -->
+      <section>
+        <div class="section-head">
+          <h3>
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+            Jalur &amp; Rute Pendakian Resmi
+          </h3>
+          <span class="section-head-line"></span>
+        </div>
 
-          <div class="media-filter-chips">
-            <button type="button" class="media-filter-btn active" data-filter="all">Semua Media</button>
-            <button type="button" class="media-filter-btn" data-filter="image">Foto</button>
-            <button type="button" class="media-filter-btn" data-filter="video">Video</button>
+        <div class="routes-grid" id="routesContainer"></div>
+      </section>
+
+      <!-- Media Gallery Section (Photo & Video Grid) -->
+      <section>
+        <div class="gallery-header-row">
+          <div class="section-head" style="margin-bottom:0;">
+            <h3>
+              <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+              Arsip Dokumentasi Visual
+            </h3>
+            <span class="section-head-line"></span>
+          </div>
+
+          <!-- Media Filters -->
+          <div class="media-filter-bar">
+            <button type="button" class="media-filter-btn active" data-category="all" onclick="filterMedia('all')">
+              <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>
+              Semua Media
+            </button>
+            <button type="button" class="media-filter-btn" data-category="image" onclick="filterMedia('image')">
+              <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+              Foto
+            </button>
+            <button type="button" class="media-filter-btn" data-category="video" onclick="filterMedia('video')">
+              <span class="svg-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
+              Video Dokumentasi
+            </button>
           </div>
         </div>
 
-        <div class="media-masonry-grid" id="mediaGrid"></div>
+        <!-- Dynamic Grid -->
+        <div class="gallery-grid" id="galleryGrid"></div>
       </section>
     </main>
 
-    <!-- Lightbox Modal -->
-    <div class="lightbox-backdrop" id="lightboxModal" onclick="closeLightbox()">
-      <div class="lightbox-card" onclick="event.stopPropagation()">
-        <button type="button" class="lightbox-close-btn" onclick="closeLightbox()">&times;</button>
-        <div id="lightboxContent" class="lightbox-media-box"></div>
-        <div class="lightbox-info">
-          <strong id="lightboxTitle"></strong>
-          <p id="lightboxDesc"></p>
+    <!-- Site Footer -->
+    <footer class="site-footer">
+      <div>© 2026 <strong>Mountain Gallery</strong> · Didesain untuk pecinta alam &amp; petualang.</div>
+      <div>Klik foto untuk melihat dalam resolusi penuh &amp; navigasi slide.</div>
+    </footer>
+  </div>
+
+  <!-- =========================================================
+       PRO LIGHTBOX MODAL
+       ========================================================= -->
+  <div class="pro-lightbox" id="lightbox">
+    <div class="lightbox-stage">
+      <!-- Top bar (Counter + Close) -->
+      <div class="lightbox-top-bar">
+        <div class="lightbox-counter" id="lightboxCounter">1 / 10</div>
+        <div class="lightbox-actions">
+          <button type="button" class="lightbox-ctrl-btn lightbox-close" id="lightboxClose" title="Tutup (Esc)">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+          </button>
         </div>
+      </div>
+
+      <!-- Navigation buttons -->
+      <button type="button" class="lightbox-nav-btn lightbox-prev" id="lightboxPrev" title="Sebelumnya (Panah Kiri)">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></span>
+      </button>
+      <button type="button" class="lightbox-nav-btn lightbox-next" id="lightboxNext" title="Berikutnya (Panah Kanan)">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+
+      <!-- Media container -->
+      <div class="lightbox-media-container">
+        <img id="lightboxImage" src="" alt="Preview Foto" style="display:none;">
+        <video id="lightboxVideo" controls style="display:none;">
+          <source id="lightboxVideoSource" src="" type="video/mp4">
+          Browser Anda tidak mendukung video.
+        </video>
+      </div>
+
+      <!-- Caption bar -->
+      <div class="lightbox-caption-bar">
+        <div class="lightbox-caption-title" id="lightboxCaptionTitle">Judul Foto</div>
+        <div class="lightbox-caption-desc" id="lightboxCaptionDesc">Deskripsi Dokumentasi</div>
       </div>
     </div>
   </div>
 
-  <!-- Application Logic -->
+  <!-- Drawer Dropdown Menu -->
+  <div class="site-dropdown" id="siteDropdown">
+    <div class="dropdown-header">
+      <div>
+        <strong>Navigasi Menu</strong>
+        <small>Mountain Gallery System</small>
+      </div>
+      <button type="button" class="dropdown-close-btn" onclick="toggleMenu(event)" aria-label="Tutup Menu">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </div>
+
+    <!-- Menu 1: Beranda Peta -->
+    <a class="dropdown-item" href="../index.html">
+      <span class="menu-icon-box">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 11L12 4L21 11M5 10V20H10V14H14V20H19V10"/></svg></span>
+      </span>
+      <div>
+        <strong>Beranda Peta</strong>
+        <small>Kembali ke peta interaktif</small>
+      </div>
+    </a>
+
+    <!-- Menu 2: Pilih Gunung Lain -->
+    <button type="button" class="dropdown-item" onclick="toggleMountainList(event)">
+      <span class="menu-icon-box">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/><path d="M9 8L11 11H7.5L9 8Z"/></svg></span>
+      </span>
+      <div>
+        <strong>Pilih Gunung Lain</strong>
+        <small>Pindah galeri gunung</small>
+      </div>
+    </button>
+
+    <div class="dropdown-mountain-list" id="dropdownMountainList"></div>
+
+    <!-- Menu 3: Tentang Website -->
+    <button type="button" class="dropdown-item" onclick="openAboutModal(event)">
+      <span class="menu-icon-box">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+      </span>
+      <div>
+        <strong>Tentang Website</strong>
+        <small>Informasi &amp; Arsitektur Project</small>
+      </div>
+    </button>
+
+    <!-- Menu 4: Login Admin -->
+    <a class="dropdown-item" href="../admin/index.html">
+      <span class="menu-icon-box" style="background: linear-gradient(135deg, #833ab4, #e1306c); color:#ffffff;">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      </span>
+      <div>
+        <strong style="color: #c13584;">Login Admin</strong>
+        <small>Kelola data gunung &amp; galeri cloud</small>
+      </div>
+    </a>
+  </div>
+
+  <!-- About Modal -->
+  <div class="app-modal" id="aboutModal">
+    <div class="app-modal-card">
+      <button type="button" class="modal-close-btn" onclick="closeAboutModal()" aria-label="Tutup">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+      <div class="modal-hero-icon">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/><path d="M9 8L11 11H7.5L9 8Z"/><path d="M17 11L18.5 14H15.5L17 11Z"/></svg></span>
+      </div>
+      <h2>Mountain Gallery</h2>
+      <p>
+        Halaman dokumentasi visual dan rute teknis pendakian. 
+        Gunakan tombol navigasi atau keyboard (panah kiri/kanan) untuk menjelajah galeri foto dan video.
+      </p>
+      <button type="button" class="modal-action-btn" onclick="closeAboutModal()">Tutup</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/cloud-db.js"></script>
   <script src="../assets/js/gallery.js"></script>
 </body>
 </html>

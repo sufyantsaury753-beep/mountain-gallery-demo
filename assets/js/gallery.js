@@ -1,243 +1,465 @@
 /**
- * MOUNTAIN GALLERY DEMO - GALLERY LOGIC (100% Standalone)
- * Rich photo/video presentation for each of the 21 mountains.
+ * MOUNTAIN GALLERY - DYNAMIC DETAIL & PRO LIGHTBOX LOGIC (Bulletproof Cloud Version)
+ * Connected with Supabase CloudDB & local data.js fallback
  */
 
 let currentMountain = null;
 let currentMediaList = [];
-let currentFilter = "all";
-let activeLightboxIndex = 0;
+let currentMediaIndex = 0;
+let currentCategory = "all";
 
-function resolveAssetPath(src) {
-  if (!src) return "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200";
-  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:")) {
-    return src;
-  }
-  return `../${src}`;
+function getUrlParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name) || urlParams.get("mountain");
 }
 
-function getMountainIdFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("id") || "gunung-gede";
-}
-
-function initGallery() {
-  const mountainId = getMountainIdFromUrl();
-
-  if (typeof DATA_GUNUNG !== "undefined" && DATA_GUNUNG[mountainId]) {
-    currentMountain = DATA_GUNUNG[mountainId];
-  } else if (typeof DATA_GUNUNG !== "undefined") {
-    currentMountain = Object.values(DATA_GUNUNG)[0];
+async function initGalleryPage() {
+  const requestedId = getUrlParameter("id") || "gunung-cikuray";
+  
+  if (typeof CloudDB !== "undefined") {
+    try {
+      currentMountain = await CloudDB.getMountainById(requestedId);
+    } catch (e) {
+      console.warn("CloudDB fetch error, falling back to local data:", e);
+    }
+  }
+  
+  if (!currentMountain && typeof getGunungById !== "undefined") {
+    currentMountain = getGunungById(requestedId);
+  }
+  if (!currentMountain && typeof DATA_GUNUNG !== "undefined") {
+    currentMountain = DATA_GUNUNG["gunung-cikuray"];
   }
 
-  if (!currentMountain) {
-    alert("Data gunung tidak ditemukan!");
-    window.location.href = "../index.html";
-    return;
-  }
+  if (!currentMountain) return;
 
-  currentMediaList = currentMountain.media || [];
-  renderHero();
-  renderTechnicalStats();
+  document.title = `${currentMountain.nama} - Mountain Gallery`;
+
+  renderHeroAndSpecs();
   renderRoutes();
-  renderMediaGrid();
-  setupFilterButtons();
-  setupDropdownNav();
+  renderGalleryGrid();
+  setupLightboxListeners();
+  setupDropdownMenu();
 }
 
-function renderHero() {
-  const coverUrl = resolveAssetPath(currentMountain.cover);
-  document.getElementById("heroBanner").style.backgroundImage = `linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.85) 100%), url('${coverUrl}')`;
-  document.getElementById("mountainName").textContent = currentMountain.nama;
-  document.getElementById("mountainLocation").innerHTML = `
-    <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-    ${currentMountain.lokasi || currentMountain.region}
-  `;
-  document.getElementById("mountainMdplBadge").textContent = currentMountain.mdplText || (currentMountain.mdpl ? `${currentMountain.mdpl.toLocaleString()} Mdpl` : "");
-  document.getElementById("mountainDesc").textContent = currentMountain.deskripsi;
-}
+function renderHeroAndSpecs() {
+  const navName = document.getElementById("navMountainName");
+  if (navName) navName.textContent = `${currentMountain.nama} · ${currentMountain.region}`;
+  
+  const heroTitle = document.getElementById("heroTitle");
+  if (heroTitle) heroTitle.textContent = currentMountain.nama;
+  
+  const infoTitle = document.getElementById("infoTitle");
+  if (infoTitle) infoTitle.textContent = currentMountain.nama;
+  
+  const heroLoc = document.getElementById("heroLocationTag");
+  if (heroLoc) {
+    heroLoc.innerHTML = `
+      <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      ${currentMountain.region}
+    `;
+  }
 
-function renderTechnicalStats() {
-  const statsContainer = document.getElementById("techStatsContainer");
-  if (!statsContainer) return;
+  const infoLoc = document.getElementById("infoLocationTag");
+  if (infoLoc) {
+    infoLoc.innerHTML = `
+      <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      ${currentMountain.lokasi}
+    `;
+  }
 
-  statsContainer.innerHTML = `
-    <div class="tech-stat-card">
-      <div class="tech-stat-icon tech-stat-purple">
-        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
-      </div>
-      <div>
-        <span class="tech-stat-label">Ketinggian Puncak</span>
-        <strong class="tech-stat-val">${currentMountain.mdplText || (currentMountain.mdpl ? `${currentMountain.mdpl.toLocaleString()} Mdpl` : "-")}</strong>
-      </div>
-    </div>
+  const coverImg = document.getElementById("heroCoverImg");
+  if (coverImg) {
+    const rawCover = currentMountain.cover || currentMountain.coverFallback || "assets/img/gunung-cikuray.jpg";
+    coverImg.src = resolveAssetPath(rawCover);
+    coverImg.alt = `Foto Cover ${currentMountain.nama}`;
+    coverImg.onerror = function() {
+      smartImageFallback(this, rawCover, currentMountain.coverFallback);
+    };
+  }
 
-    <div class="tech-stat-card">
-      <div class="tech-stat-icon tech-stat-rose">
-        <span class="svg-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-      </div>
-      <div>
-        <span class="tech-stat-label">Tingkat Kesulitan</span>
-        <strong class="tech-stat-val">${currentMountain.tingkatKesulitan || "Sedang"}</strong>
-      </div>
-    </div>
+  const attrText = document.getElementById("heroAttributionText");
+  if (attrText) attrText.textContent = currentMountain.atribusi || "Dokumentasi Pendakian Indonesia";
+  
+  const mDesc = document.getElementById("mountainDescription");
+  if (mDesc) mDesc.textContent = currentMountain.deskripsi;
+  
+  const mDescExtra = document.getElementById("mountainDescriptionExtra");
+  if (mDescExtra) mDescExtra.textContent = currentMountain.deskripsiTambahan || "";
 
-    <div class="tech-stat-card">
-      <div class="tech-stat-icon tech-stat-emerald">
-        <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-      </div>
-      <div>
-        <span class="tech-stat-label">Estimasi Pendakian</span>
-        <strong class="tech-stat-val">${currentMountain.estimasiWaktu || "6 - 8 Jam"}</strong>
-      </div>
-    </div>
+  // Specs Matrix
+  const specElev = document.getElementById("specElevation");
+  if (specElev) specElev.textContent = currentMountain.mdplText || `${currentMountain.mdpl} Mdpl`;
+  
+  const specDiff = document.getElementById("specDifficulty");
+  if (specDiff) specDiff.textContent = currentMountain.tingkatKesulitan || "Menengah";
+  
+  const specDur = document.getElementById("specDuration");
+  if (specDur) specDur.textContent = currentMountain.estimasiWaktu || "4 - 6 Jam";
 
-    <div class="tech-stat-card">
-      <div class="tech-stat-icon tech-stat-amber">
-        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></span>
+  // Tags
+  const tagsContainer = document.getElementById("tagsContainer");
+  if (tagsContainer) {
+    const tags = currentMountain.tags || [currentMountain.region || "Indonesia"];
+    tagsContainer.innerHTML = tags.map(t => `
+      <div class="tag-chip">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+        ${t}
       </div>
-      <div>
-        <span class="tech-stat-label">Suhu Puncak Rata-rata</span>
-        <strong class="tech-stat-val">${currentMountain.suhuPuncak || "6°C - 14°C"}</strong>
-      </div>
-    </div>
-  `;
+    `).join("");
+  }
 }
 
 function renderRoutes() {
-  const routesContainer = document.getElementById("routesListContainer");
+  const routesContainer = document.getElementById("routesContainer");
   if (!routesContainer) return;
 
-  const routes = currentMountain.jalurPendakian || [];
-  if (routes.length === 0) {
-    routesContainer.innerHTML = `<p style="color:var(--text-muted); font-size:13px;">Informasi jalur pendakian belum ditambahkan.</p>`;
+  if (!currentMountain.jalurPendakian || currentMountain.jalurPendakian.length === 0) {
+    routesContainer.innerHTML = "<p style='color:#737373; font-size:13px;'>Informasi jalur pendakian segera diperbarui.</p>";
     return;
   }
 
-  routesContainer.innerHTML = routes.map((r, i) => `
-    <div class="route-card-item">
-      <div class="route-badge-num">${i + 1}</div>
-      <div class="route-details">
-        <strong>${r.nama}</strong>
-        <div class="route-meta">
-          <span>⏱️ ${r.waktu}</span>
-          ${r.status ? `<span>✨ ${r.status}</span>` : ""}
-        </div>
+  routesContainer.innerHTML = currentMountain.jalurPendakian.map(r => `
+    <div class="route-card">
+      <div class="route-card-title">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
+        ${r.nama}
+      </div>
+      <div class="route-card-meta">
+        <span>
+          <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+          Estimasi: ${r.waktu}
+        </span>
+        <span>
+          <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+          ${r.status}
+        </span>
       </div>
     </div>
   `).join("");
 }
 
-function renderMediaGrid() {
-  const grid = document.getElementById("mediaGrid");
-  if (!grid) return;
-
-  const filtered = currentMediaList.filter(m => {
-    if (currentFilter === "image") return m.type === "image" || !m.type;
-    if (currentFilter === "video") return m.type === "video";
-    return true;
+function filterMedia(category) {
+  currentCategory = category;
+  document.querySelectorAll(".media-filter-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.category === category);
   });
 
-  if (filtered.length === 0) {
+  renderGalleryGrid();
+}
+
+function renderGalleryGrid() {
+  const grid = document.getElementById("galleryGrid");
+  if (!grid) return;
+
+  const mediaList = currentMountain.media || [];
+  
+  currentMediaList = mediaList.filter(m => {
+    if (currentCategory === "all") return true;
+    return m.type === currentCategory;
+  });
+
+  if (currentMediaList.length === 0) {
     grid.innerHTML = `
-      <div style="grid-column:1/-1; text-align:center; padding:40px 20px; color:var(--text-muted);">
-        <p style="font-size:15px; font-weight:700;">Belum ada media untuk kategori ini.</p>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #8a5a96; font-weight: 700;">
+        Tidak ada media untuk kategori ini.
       </div>
     `;
     return;
   }
 
-  grid.innerHTML = filtered.map((m, idx) => {
-    const isVideo = m.type === "video";
-    const src = resolveAssetPath(m.src);
-    return `
-      <div class="media-card" onclick="openLightbox(${idx})">
-        <div class="media-thumb-container">
-          ${isVideo ? `
-            <video src="${src}" preload="metadata"></video>
-            <div class="video-play-badge">
+  grid.innerHTML = currentMediaList.map((media, index) => {
+    const resolvedSrc = resolveAssetPath(media.src);
+
+    if (media.type === "video") {
+      return `
+        <article class="gallery-card" data-index="${index}" role="button" tabindex="0" aria-label="Buka video ${media.title || ''}">
+          <video muted preload="metadata">
+            <source src="${resolvedSrc}" type="video/mp4">
+          </video>
+          <div class="video-badge-pill">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
+            Video
+          </div>
+          <div class="video-play-center">
+            <div class="play-bubble">
               <span class="svg-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
             </div>
-          ` : `
-            <img src="${src}" alt="${m.title || currentMountain.nama}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400'">
-          `}
+          </div>
+          <div class="gallery-card-overlay">
+            <div class="gallery-card-title">${media.title || "Dokumentasi Video"}</div>
+          </div>
+        </article>
+      `;
+    }
+
+    return `
+      <article class="gallery-card" data-index="${index}" role="button" tabindex="0" aria-label="Buka foto ${media.title || ''}">
+        <img src="${resolvedSrc}" alt="${media.title || 'Foto'}" onerror="smartImageFallback(this, '${media.src}')">
+        <div class="gallery-card-overlay">
+          <div class="gallery-card-title">${media.title || "Dokumentasi Foto"}</div>
         </div>
-        <div class="media-caption-box">
-          <strong class="media-card-title">${m.title || currentMountain.nama}</strong>
-          ${m.desc ? `<p class="media-card-desc">${m.desc}</p>` : ""}
-        </div>
-      </div>
+      </article>
     `;
   }).join("");
-}
 
-function setupFilterButtons() {
-  document.querySelectorAll(".media-filter-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".media-filter-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentFilter = btn.dataset.filter;
-      renderMediaGrid();
+  // Attach touch and click events directly to cards
+  grid.querySelectorAll(".gallery-card").forEach(card => {
+    const idx = parseInt(card.getAttribute("data-index"), 10);
+    card.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openLightbox(idx);
     });
   });
 }
 
-function setupDropdownNav() {
-  const container = document.getElementById("dropdownMountainList");
-  if (!container || typeof DATA_GUNUNG === "undefined") return;
+function smartImageFallback(img, originalPath, secondaryFallback) {
+  if (!originalPath || originalPath.startsWith("data:") || originalPath.startsWith("http://") || originalPath.startsWith("https://")) {
+    img.onerror = null;
+    img.src = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80";
+    return;
+  }
+  const extensions = [".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG", ".webp"];
+  
+  if (!img.dataset.extAttempt) {
+    img.dataset.extAttempt = "0";
+  }
+  
+  let attempt = parseInt(img.dataset.extAttempt);
+  if (attempt < extensions.length) {
+    img.dataset.extAttempt = (attempt + 1).toString();
+    const lastDot = originalPath.lastIndexOf(".");
+    if (lastDot > 0) {
+      const base = originalPath.substring(0, lastDot);
+      const tryExt = extensions[attempt];
+      img.src = resolveAssetPath(base + tryExt);
+      return;
+    }
+  }
 
-  const mountains = Object.values(DATA_GUNUNG);
-  container.innerHTML = mountains.map(g => `
-    <a class="dropdown-mountain-item ${g.id === currentMountain.id ? 'active' : ''}" href="index.html?id=${g.id}">
-      <img src="${resolveAssetPath(g.cover)}" alt="${g.nama}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=100'">
-      <div class="dropdown-mountain-item-info">
-        <strong>${g.nama}</strong>
-        <small>${g.region} · ${g.mdplText || (g.mdpl ? `${g.mdpl.toLocaleString()} Mdpl` : "")}</small>
-      </div>
+  if (secondaryFallback && !img.dataset.secondaryTried) {
+    img.dataset.secondaryTried = "true";
+    img.src = resolveAssetPath(secondaryFallback);
+    return;
+  }
+
+  img.onerror = null;
+  img.src = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80";
+}
+
+function toggleCoverAttribution() {
+  const box = document.getElementById("heroAttributionBox");
+  if (box) box.classList.toggle("show");
+}
+
+/* =========================================================
+   PRO LIGHTBOX ENGINE (NEXT/PREV/KEYBOARD/TOUCH SWIPE)
+   ========================================================= */
+function openLightbox(index) {
+  if (!currentMediaList || currentMediaList.length === 0) return;
+  currentMediaIndex = index;
+  updateLightboxContent();
+
+  const lightbox = document.getElementById("lightbox");
+  if (lightbox) {
+    lightbox.classList.add("active");
+  }
+  document.body.style.overflow = "hidden";
+}
+
+function updateLightboxContent() {
+  const item = currentMediaList[currentMediaIndex];
+  if (!item) return;
+
+  const total = currentMediaList.length;
+  const lightboxCounter = document.getElementById("lightboxCounter");
+  const lightboxCaptionTitle = document.getElementById("lightboxCaptionTitle");
+  const lightboxCaptionDesc = document.getElementById("lightboxCaptionDesc");
+  const lightboxImg = document.getElementById("lightboxImage");
+  const lightboxVid = document.getElementById("lightboxVideo");
+  const lightboxVidSrc = document.getElementById("lightboxVideoSource");
+
+  if (lightboxCounter) lightboxCounter.textContent = `${currentMediaIndex + 1} / ${total}`;
+  if (lightboxCaptionTitle) lightboxCaptionTitle.textContent = item.title || "Dokumentasi Pendakian";
+  if (lightboxCaptionDesc) lightboxCaptionDesc.textContent = item.desc || "";
+
+  const resolved = resolveAssetPath(item.src);
+
+  if (item.type === "video") {
+    if (lightboxImg) lightboxImg.style.display = "none";
+    if (lightboxVid && lightboxVidSrc) {
+      lightboxVid.style.display = "block";
+      lightboxVidSrc.src = resolved;
+      lightboxVid.load();
+      lightboxVid.play().catch(() => {});
+    }
+  } else {
+    if (lightboxVid) {
+      lightboxVid.pause();
+      lightboxVid.style.display = "none";
+    }
+    if (lightboxImg) {
+      lightboxImg.style.display = "block";
+      lightboxImg.src = resolved;
+      lightboxImg.alt = item.title || "Foto Detail";
+      lightboxImg.onerror = function() {
+        smartImageFallback(this, item.src);
+      };
+    }
+  }
+}
+
+function nextLightboxSlide() {
+  if (!currentMediaList || currentMediaList.length === 0) return;
+  currentMediaIndex = (currentMediaIndex + 1) % currentMediaList.length;
+  updateLightboxContent();
+}
+
+function prevLightboxSlide() {
+  if (!currentMediaList || currentMediaList.length === 0) return;
+  currentMediaIndex = (currentMediaIndex - 1 + currentMediaList.length) % currentMediaList.length;
+  updateLightboxContent();
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById("lightbox");
+  if (lightbox) {
+    lightbox.classList.remove("active");
+  }
+  document.body.style.overflow = "";
+
+  const lightboxImg = document.getElementById("lightboxImage");
+  if (lightboxImg) lightboxImg.src = "";
+
+  const lightboxVid = document.getElementById("lightboxVideo");
+  const lightboxVidSrc = document.getElementById("lightboxVideoSource");
+  if (lightboxVid) lightboxVid.pause();
+  if (lightboxVidSrc) lightboxVidSrc.src = "";
+}
+
+function setupLightboxListeners() {
+  const closeBtn = document.getElementById("lightboxClose");
+  if (closeBtn) closeBtn.onclick = closeLightbox;
+  
+  const nextBtn = document.getElementById("lightboxNext");
+  if (nextBtn) nextBtn.onclick = nextLightboxSlide;
+  
+  const prevBtn = document.getElementById("lightboxPrev");
+  if (prevBtn) prevBtn.onclick = prevLightboxSlide;
+
+  const lightbox = document.getElementById("lightbox");
+  if (lightbox) {
+    lightbox.onclick = (e) => {
+      if (e.target === lightbox) closeLightbox();
+    };
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const lb = document.getElementById("lightbox");
+    if (!lb || !lb.classList.contains("active")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") nextLightboxSlide();
+    if (e.key === "ArrowLeft") prevLightboxSlide();
+  });
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  if (lightbox) {
+    lightbox.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    lightbox.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (Math.abs(touchEndX - touchStartX) > 45) {
+        if (touchEndX - touchStartX < 0) nextLightboxSlide();
+        else prevLightboxSlide();
+      }
+    }, false);
+  }
+}
+
+async function setupDropdownMenu() {
+  const mountainDropdownList = document.getElementById("dropdownMountainList");
+  if (!mountainDropdownList) return;
+
+  let mountains = [];
+  if (typeof CloudDB !== "undefined") {
+    try {
+      mountains = await CloudDB.getAllMountains();
+    } catch (e) {
+      console.warn("Dropdown CloudDB fallback:", e);
+    }
+  }
+  if ((!mountains || mountains.length === 0) && typeof LIST_GUNUNG !== "undefined") {
+    mountains = LIST_GUNUNG;
+  }
+
+  mountainDropdownList.innerHTML = mountains.map(g => `
+    <a class="dropdown-mountain-item" href="index.html?id=${g.id}">
+      <strong>
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
+        ${g.nama}
+      </strong>
+      <span>${g.mdplText || (g.mdpl ? `${g.mdpl.toLocaleString()} Mdpl` : '')}</span>
     </a>
   `).join("");
 }
 
-function toggleMenu(e) {
-  if (e) e.stopPropagation();
+function toggleMenu(event) {
+  if (event) event.stopPropagation();
   const dropdown = document.getElementById("siteDropdown");
-  if (dropdown) dropdown.classList.toggle("open");
+  if (dropdown) dropdown.classList.toggle("active");
 }
 
-function toggleMountainList(e) {
-  if (e) e.stopPropagation();
+function toggleMountainList(event) {
+  if (event) event.stopPropagation();
   const list = document.getElementById("dropdownMountainList");
-  if (list) list.classList.toggle("open");
+  if (list) list.classList.toggle("active");
 }
 
-function openLightbox(index) {
-  activeLightboxIndex = index;
-  const item = currentMediaList[index];
-  if (!item) return;
-
-  const modal = document.getElementById("lightboxModal");
-  const container = document.getElementById("lightboxContent");
-  const title = document.getElementById("lightboxTitle");
-  const desc = document.getElementById("lightboxDesc");
-
-  const src = resolveAssetPath(item.src);
-  if (item.type === "video") {
-    container.innerHTML = `<video src="${src}" controls autoplay style="max-width:100%; max-height:75vh; border-radius:12px;"></video>`;
-  } else {
-    container.innerHTML = `<img src="${src}" alt="${item.title || ''}" style="max-width:100%; max-height:75vh; border-radius:12px; object-fit:contain;">`;
-  }
-
-  if (title) title.textContent = item.title || currentMountain.nama;
-  if (desc) desc.textContent = item.desc || "";
-
-  modal.classList.add("active");
+function openAboutModal(event) {
+  if (event) event.stopPropagation();
+  const dropdown = document.getElementById("siteDropdown");
+  if (dropdown) dropdown.classList.remove("active");
+  const modal = document.getElementById("aboutModal");
+  if (modal) modal.classList.add("active");
 }
 
-function closeLightbox() {
-  const modal = document.getElementById("lightboxModal");
+function closeAboutModal() {
+  const modal = document.getElementById("aboutModal");
   if (modal) modal.classList.remove("active");
-  const container = document.getElementById("lightboxContent");
-  if (container) container.innerHTML = "";
 }
 
-document.addEventListener("DOMContentLoaded", initGallery);
+document.addEventListener("DOMContentLoaded", () => {
+  initGalleryPage();
+
+  document.addEventListener("click", (e) => {
+    const dropdown = document.getElementById("siteDropdown");
+    const menuBtn = document.querySelector(".menu-trigger-btn");
+    if (dropdown && !dropdown.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
+      dropdown.classList.remove("active");
+    }
+  });
+
+  const aboutModal = document.getElementById("aboutModal");
+  if (aboutModal) {
+    aboutModal.addEventListener("click", (e) => {
+      if (e.target === aboutModal) closeAboutModal();
+    });
+  }
+});
+
+// Window Exports
+if (typeof window !== "undefined") {
+  window.openLightbox = openLightbox;
+  window.closeLightbox = closeLightbox;
+  window.nextLightboxSlide = nextLightboxSlide;
+  window.prevLightboxSlide = prevLightboxSlide;
+  window.filterMedia = filterMedia;
+  window.toggleMenu = toggleMenu;
+  window.toggleMountainList = toggleMountainList;
+  window.openAboutModal = openAboutModal;
+  window.closeAboutModal = closeAboutModal;
+}
