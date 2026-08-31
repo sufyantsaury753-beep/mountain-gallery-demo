@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mountain Gallery Demo - Peta &amp; Eksplorasi 21 Gunung Indonesia</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Custom Stylesheets -->
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/map.css" />
+</head>
+
+<body>
+  <div class="page-container">
+    <!-- Topbar Navigation -->
+    <header class="topbar">
+      <a class="brand-wrapper" href="index.html">
+        <div class="brand-logo">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Mountain Icon" role="img">
+            <defs>
+              <linearGradient id="igLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#833AB4"/>
+                <stop offset="35%" stop-color="#C13584"/>
+                <stop offset="70%" stop-color="#F56040"/>
+                <stop offset="100%" stop-color="#FCAF45"/>
+              </linearGradient>
+            </defs>
+            <rect x="6" y="6" width="52" height="52" rx="16" fill="#ffffff"/>
+            <path d="M14 44L28 22L36 34L43 27L51 44" fill="none" stroke="url(#igLogoGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 44H51" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="46" cy="18" r="4" fill="#FCAF45"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>Mountain Gallery <span style="font-size:10px; background:linear-gradient(135deg, #833ab4, #e1306c); color:#fff; padding:2px 8px; border-radius:999px; font-weight:800; vertical-align:middle; text-transform:uppercase; letter-spacing:0.5px;">Live Demo</span></h1>
+          <p>Eksplorasi Puncak &amp; Jalur Pendakian Pulau Jawa</p>
+        </div>
+      </a>
+
+      <div class="topbar-actions">
+        <!-- Hamburger Menu Button -->
+        <button type="button" class="menu-trigger-btn" onclick="toggleMenu(event)" aria-label="Buka Menu">
+          <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
+        </button>
+      </div>
+
+      <!-- Drawer Dropdown Menu -->
+      <div class="site-dropdown" id="siteDropdown">
+        <div class="dropdown-header">
+          <div>
+            <strong>Navigasi Menu</strong>
+            <small>Mountain Gallery Showcase</small>
+          </div>
+          <button type="button" class="dropdown-close-btn" onclick="toggleMenu(event)" aria-label="Tutup Menu">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+          </button>
+        </div>
+
+        <!-- Menu 1: Beranda Peta -->
+        <a class="dropdown-item" href="index.html">
+          <span class="menu-icon-box">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 11L12 4L21 11M5 10V20H10V14H14V20H19V10"/></svg></span>
+          </span>
+          <div>
+            <strong>Beranda Peta</strong>
+            <small>Kembali ke peta interaktif 21 gunung</small>
+          </div>
+        </a>
+
+        <!-- Menu 2: Pilih Destinasi Gunung -->
+        <button type="button" class="dropdown-item" onclick="toggleMountainList(event)">
+          <span class="menu-icon-box">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/><path d="M9 8L11 11H7.5L9 8Z"/></svg></span>
+          </span>
+          <div>
+            <strong>Pilih Destinasi Gunung</strong>
+            <small id="dropdownMountainCountSubtitle">21 Destinasi Gunung Terdaftar</small>
+          </div>
+        </button>
+
+        <!-- Dropdown Accordion List -->
+        <div class="dropdown-mountain-list" id="dropdownMountainList"></div>
+
+        <!-- Menu 3: Tentang Website -->
+        <button type="button" class="dropdown-item" onclick="openAboutModal(event)">
+          <span class="menu-icon-box">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+          </span>
+          <div>
+            <strong>Tentang Website</strong>
+            <small>Fitur &amp; Informasi Pemesanan Project</small>
+          </div>
+        </button>
+
+        <!-- Menu 4: Demo Admin CMS -->
+        <a class="dropdown-item" href="admin/index.html">
+          <span class="menu-icon-box" style="background: linear-gradient(135deg, #833ab4, #e1306c); color:#ffffff;">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          </span>
+          <div>
+            <strong style="color: #c13584;">Demo Admin CMS</strong>
+            <small>Uji coba kelola data gunung &amp; upload</small>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Map Section -->
+    <main class="map-section">
+      <!-- Controls Bar (Filters & Basemap) -->
+      <div class="map-controls-bar">
+        <!-- Filter Chips: Semua Gunung, Jawa Barat, Jawa Tengah, Jawa Timur -->
+        <div class="filter-chips">
+          <button type="button" class="filter-chip active" data-filter="all">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>
+            Semua (21)
+          </button>
+          <button type="button" class="filter-chip" data-filter="jabar">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            Jabar (10)
+          </button>
+          <button type="button" class="filter-chip" data-filter="jateng">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            Jateng (6)
+          </button>
+          <button type="button" class="filter-chip" data-filter="jatim">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            Jatim (5)
+          </button>
+        </div>
+
+        <!-- Layer Switcher: Peta, Topografi, Satelit -->
+        <div class="layer-switcher">
+          <button type="button" class="layer-btn active" data-layer="street" onclick="setBasemap('street')">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></span>
+            Peta
+          </button>
+          <button type="button" class="layer-btn" data-layer="topo" onclick="setBasemap('topo')">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
+            Topografi
+          </button>
+          <button type="button" class="layer-btn" data-layer="satellite" onclick="setBasemap('satellite')">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+            Satelit
+          </button>
+        </div>
+      </div>
+
+      <!-- Map Wrapper -->
+      <div class="map-wrapper">
+        <div id="map"></div>
+      </div>
+    </main>
+
+    <!-- Modal Tentang Website -->
+    <div class="about-modal-backdrop" id="aboutModal" onclick="closeAboutModal()">
+      <div class="about-modal-card" onclick="event.stopPropagation()">
+        <div class="about-modal-header">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="brand-logo" style="width:40px; height:40px; padding:6px;">
+              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="6" width="52" height="52" rx="16" fill="#ffffff"/>
+                <path d="M14 44L28 22L36 34L43 27L51 44" fill="none" stroke="url(#igLogoGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 44H51" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="46" cy="18" r="4" fill="#FCAF45"/>
+              </svg>
+            </div>
+            <div>
+              <h3 style="font-size:18px; font-weight:900; color:var(--text-main); margin:0;">Mountain Gallery System</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin:0;">Website Peta Digital GIS &amp; Manajemen Galeri Wisata</p>
+            </div>
+          </div>
+          <button type="button" class="dropdown-close-btn" onclick="closeAboutModal()" aria-label="Tutup">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+          </button>
+        </div>
+        
+        <div class="about-modal-body" style="padding:20px; font-size:13.5px; color:var(--text-muted); line-height:1.6;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <strong style="color:var(--text-main); font-size:14.5px; display:block; margin-bottom:6px;">🌟 Fitur Unggulan Project Ini:</strong>
+            <ul style="margin-left:18px; display:flex; flex-direction:column; gap:6px;">
+              <li><strong>Peta Digital Interaktif:</strong> 21 Gunung se-Pulau Jawa (Jabar, Jateng, Jatim) dengan koordinat presisi.</li>
+              <li><strong>Layer Multi-Map:</strong> Mode Peta Standar, Topografi Kontur Ketinggian, dan Satelit Real-time.</li>
+              <li><strong>Galeri Foto &amp; Video HD:</strong> Eksplorasi dokumentasi, rute pendakian, dan data teknis MDPL.</li>
+              <li><strong>Dashboard Admin Mandiri:</strong> Tambah/edit destinasi &amp; upload media tanpa koding.</li>
+              <li><strong>Bebas Biaya Server (Rp 0):</strong> Siap online di GitHub Pages atau Vercel.</li>
+            </ul>
+          </div>
+
+          <div style="text-align:center; padding:12px 0;">
+            <p style="font-size:13px; margin-bottom:12px;">Tertarik memiliki website seperti ini untuk bisnis Open Trip, Tour, atau Wisata Anda?</p>
+            <a href="admin/index.html" class="btn-admin-primary" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px; color:#fff; text-decoration:none; font-weight:800; font-size:13px;">
+              Uji Coba Demo Admin CMS
+              <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Application Logic -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/map.js"></script>
+</body>
+</html>
