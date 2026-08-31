@@ -249,13 +249,13 @@ function setupDrawerMenu() {
   if (!container) return;
 
   container.innerHTML = cachedMountains.map(g => `
-    <div class="dropdown-mountain-item" style="cursor:pointer;" onclick="selectMountainFromMenu('${g.id}')">
-      <img src="${resolveAssetPath(g.cover)}" alt="${g.nama}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=100'">
-      <div class="dropdown-mountain-item-info">
-        <strong>${g.nama}</strong>
-        <small>${g.region} · ${g.mdplText || (g.mdpl ? `${g.mdpl.toLocaleString()} Mdpl` : "")}</small>
-      </div>
-    </div>
+    <button type="button" class="dropdown-mountain-item" onclick="selectMountainFromMenu('${g.id}')">
+      <strong>
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/></svg></span>
+        ${g.nama}
+      </strong>
+      <span>${g.mdplText || (g.mdpl ? `${g.mdpl.toLocaleString()} Mdpl` : '')}</span>
+    </button>
   `).join("");
 }
 
