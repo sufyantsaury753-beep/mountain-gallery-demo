@@ -1,6 +1,7 @@
 /**
  * MOUNTAIN GALLERY DEMO - MAP LOGIC (100% Standalone)
  * Interactive Leaflet Map with 21 Mountains across West, Central, and East Java.
+ * Features smooth flyTo zooming on click and region panning.
  */
 
 let map;
@@ -62,7 +63,7 @@ const luxuryIcon = L.divIcon({
 
 function resolveAssetPath(src) {
   if (!src) return "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400";
-  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:")) {
+  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:") || src.startsWith("blob:")) {
     return src;
   }
   return src;
@@ -142,6 +143,47 @@ function buatPopupHtml(gunung) {
   `;
 }
 
+function fokusGunung(gunung, targetMarker) {
+  if (!gunung || !gunung.lat || !gunung.lng) return;
+
+  map.flyTo([gunung.lat, gunung.lng], 11, {
+    animate: true,
+    duration: 1.1,
+    easeLinearity: 0.25
+  });
+
+  setTimeout(() => {
+    if (targetMarker) {
+      targetMarker.openPopup();
+    } else {
+      const found = markers.find(m => m.gunungData && m.gunungData.id === gunung.id);
+      if (found) found.openPopup();
+    }
+  }, 1150);
+}
+
+function selectMountainFromMenu(mountainId) {
+  const dropdown = document.getElementById("siteDropdown");
+  if (dropdown) {
+    dropdown.classList.remove("active");
+    dropdown.classList.remove("open");
+  }
+
+  const gunung = cachedMountains.find(m => m.id === mountainId || m.slug === mountainId);
+  if (gunung) {
+    if (currentFilterRegion !== "all") {
+      currentFilterRegion = "all";
+      document.querySelectorAll(".filter-chip").forEach(c => {
+        c.classList.toggle("active", c.dataset.filter === "all");
+      });
+      renderMarkers();
+    }
+
+    const marker = markers.find(m => m.gunungData && m.gunungData.id === gunung.id);
+    fokusGunung(gunung, marker);
+  }
+}
+
 function renderMarkers() {
   markers.forEach(m => map.removeLayer(m));
   markers = [];
@@ -160,9 +202,15 @@ function renderMarkers() {
     if (!gunung.lat || !gunung.lng) return;
 
     const marker = L.marker([gunung.lat, gunung.lng], { icon: luxuryIcon });
+    marker.gunungData = gunung;
     marker.bindPopup(buatPopupHtml(gunung), {
       maxWidth: 270,
       className: "custom-lux-popup"
+    });
+
+    // Zoom & Pan to marker on click
+    marker.on("click", () => {
+      fokusGunung(gunung, marker);
     });
 
     marker.addTo(map);
@@ -177,6 +225,17 @@ function setupFilters() {
       chip.classList.add("active");
       currentFilterRegion = chip.dataset.filter;
       renderMarkers();
+
+      // Smooth pan to selected province region
+      if (currentFilterRegion === "all") {
+        map.flyTo([-7.45, 110.15], 7, { animate: true, duration: 1.0 });
+      } else if (currentFilterRegion === "jabar") {
+        map.flyTo([-6.95, 107.50], 8.2, { animate: true, duration: 1.0 });
+      } else if (currentFilterRegion === "jateng") {
+        map.flyTo([-7.35, 110.15], 8.2, { animate: true, duration: 1.0 });
+      } else if (currentFilterRegion === "jatim") {
+        map.flyTo([-7.95, 112.95], 8.2, { animate: true, duration: 1.0 });
+      }
     });
   });
 }
@@ -190,13 +249,13 @@ function setupDrawerMenu() {
   if (!container) return;
 
   container.innerHTML = cachedMountains.map(g => `
-    <a class="dropdown-mountain-item" href="galeri/index.html?id=${g.id}">
+    <div class="dropdown-mountain-item" style="cursor:pointer;" onclick="selectMountainFromMenu('${g.id}')">
       <img src="${resolveAssetPath(g.cover)}" alt="${g.nama}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=100'">
       <div class="dropdown-mountain-item-info">
         <strong>${g.nama}</strong>
         <small>${g.region} · ${g.mdplText || (g.mdpl ? `${g.mdpl.toLocaleString()} Mdpl` : "")}</small>
       </div>
-    </a>
+    </div>
   `).join("");
 }
 
