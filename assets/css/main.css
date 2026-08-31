@@ -258,7 +258,7 @@ body::before {
   transition: var(--transition-smooth);
 }
 
-.site-dropdown.active {
+.site-dropdown.active, .site-dropdown.open {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
@@ -441,7 +441,7 @@ body::before {
   backdrop-filter: blur(10px);
 }
 
-.app-modal.active {
+.app-modal.active, .app-modal.open, .about-modal-backdrop.active {
   display: flex;
   animation: fadeIn 0.25s ease-out;
 }

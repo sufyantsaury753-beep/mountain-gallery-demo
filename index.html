@@ -35,8 +35,8 @@
           </svg>
         </div>
         <div class="brand-info">
-          <h1>Mountain Gallery <span style="font-size:10px; background:linear-gradient(135deg, #833ab4, #e1306c); color:#fff; padding:2px 8px; border-radius:999px; font-weight:800; vertical-align:middle; text-transform:uppercase; letter-spacing:0.5px;">Live Demo</span></h1>
-          <p>Eksplorasi Puncak &amp; Jalur Pendakian Pulau Jawa</p>
+          <h1>Mountain Gallery</h1>
+          <p>Eksplorasi 21 Puncak &amp; Jalur Pendakian Pulau Jawa</p>
         </div>
       </a>
 
@@ -91,7 +91,7 @@
           </span>
           <div>
             <strong>Tentang Website</strong>
-            <small>Fitur &amp; Informasi Pemesanan Project</small>
+            <small>Fitur &amp; Informasi Project</small>
           </div>
         </button>
 
@@ -155,50 +155,35 @@
       </div>
     </main>
 
-    <!-- Modal Tentang Website -->
-    <div class="about-modal-backdrop" id="aboutModal" onclick="closeAboutModal()">
-      <div class="about-modal-card" onclick="event.stopPropagation()">
-        <div class="about-modal-header">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div class="brand-logo" style="width:40px; height:40px; padding:6px;">
-              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <rect x="6" y="6" width="52" height="52" rx="16" fill="#ffffff"/>
-                <path d="M14 44L28 22L36 34L43 27L51 44" fill="none" stroke="url(#igLogoGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M22 44H51" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
-                <circle cx="46" cy="18" r="4" fill="#FCAF45"/>
-              </svg>
-            </div>
-            <div>
-              <h3 style="font-size:18px; font-weight:900; color:var(--text-main); margin:0;">Mountain Gallery System</h3>
-              <p style="font-size:12px; color:var(--text-muted); margin:0;">Website Peta Digital GIS &amp; Manajemen Galeri Wisata</p>
-            </div>
-          </div>
-          <button type="button" class="dropdown-close-btn" onclick="closeAboutModal()" aria-label="Tutup">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
-          </button>
-        </div>
-        
-        <div class="about-modal-body" style="padding:20px; font-size:13.5px; color:var(--text-muted); line-height:1.6;">
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
-            <strong style="color:var(--text-main); font-size:14.5px; display:block; margin-bottom:6px;">🌟 Fitur Unggulan Project Ini:</strong>
-            <ul style="margin-left:18px; display:flex; flex-direction:column; gap:6px;">
-              <li><strong>Peta Digital Interaktif:</strong> 21 Gunung se-Pulau Jawa (Jabar, Jateng, Jatim) dengan koordinat presisi.</li>
-              <li><strong>Layer Multi-Map:</strong> Mode Peta Standar, Topografi Kontur Ketinggian, dan Satelit Real-time.</li>
-              <li><strong>Galeri Foto &amp; Video HD:</strong> Eksplorasi dokumentasi, rute pendakian, dan data teknis MDPL.</li>
-              <li><strong>Dashboard Admin Mandiri:</strong> Tambah/edit destinasi &amp; upload media tanpa koding.</li>
-              <li><strong>Bebas Biaya Server (Rp 0):</strong> Siap online di GitHub Pages atau Vercel.</li>
-            </ul>
-          </div>
+    <!-- Site Footer -->
+    <footer class="site-footer">
+      <div>© 2026 <strong>Mountain Gallery Demo</strong> · 21 Gunung Pilihan Pulau Jawa.</div>
+      <div>Pilih pin pada peta atau gunakan menu navigasi untuk melihat detail &amp; galeri.</div>
+    </footer>
+  </div>
 
-          <div style="text-align:center; padding:12px 0;">
-            <p style="font-size:13px; margin-bottom:12px;">Tertarik memiliki website seperti ini untuk bisnis Open Trip, Tour, atau Wisata Anda?</p>
-            <a href="admin/index.html" class="btn-admin-primary" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px; color:#fff; text-decoration:none; font-weight:800; font-size:13px;">
-              Uji Coba Demo Admin CMS
-              <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-            </a>
-          </div>
-        </div>
+  <!-- Modal Dialog (About) -->
+  <div class="app-modal" id="aboutModal">
+    <div class="app-modal-card">
+      <button type="button" class="modal-close-btn" onclick="closeAboutModal()" aria-label="Tutup">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+
+      <div class="modal-hero-icon">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 19L9 8L14 15L17 11L21 19H3Z"/><path d="M9 8L11 11H7.5L9 8Z"/><path d="M17 11L18.5 14H15.5L17 11Z"/></svg></span>
       </div>
+
+      <h2>Mountain Gallery</h2>
+      <p>
+        <strong>Mountain Gallery</strong> adalah platform galeri interaktif berbasis peta digital yang mendokumentasikan keindahan alam, jalur pendakian, dan arsip momen berharga di 21 gunung di Pulau Jawa (Jawa Barat, Jawa Tengah, dan Jawa Timur).
+      </p>
+      <p>
+        Dilengkapi sistem multi-layer basemap, galeri foto &amp; video HD, dan panel Admin CMS mandiri yang bisa diuji coba secara langsung.
+      </p>
+
+      <button type="button" class="modal-action-btn" onclick="closeAboutModal()">
+        Mulai Menjelajah
+      </button>
     </div>
   </div>
 

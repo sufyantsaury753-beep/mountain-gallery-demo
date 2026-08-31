@@ -74,7 +74,7 @@ function initMap() {
     [-5.00, 115.50]
   ];
 
-  // Center on Java Island
+  // View encompassing West, Central, and East Java
   map = L.map("map", {
     maxBounds: mapBounds,
     maxBoundsViscosity: 0.8,
@@ -129,18 +129,14 @@ function buatPopupHtml(gunung) {
       </div>
       <div class="lux-popup-body">
         <h4 class="lux-popup-title">${gunung.nama}</h4>
-        <p class="lux-popup-location">
+        <div class="lux-popup-loc">
           <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
           ${gunung.lokasi || gunung.region}
-        </p>
-        <p class="lux-popup-desc">${(gunung.deskripsi || "").slice(0, 110)}...</p>
-        <div class="lux-popup-footer">
-          <span class="lux-difficulty-tag">${gunung.tingkatKesulitan || "Sedang"}</span>
-          <a href="${galleryUrl}" class="lux-btn-explore">
-            Buka Galeri &amp; Detail
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-          </a>
         </div>
+        <a href="${galleryUrl}" class="popup-gallery-btn">
+          <span>Buka Galeri &amp; Detail</span>
+          <span class="svg-icon"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
       </div>
     </div>
   `;
@@ -157,12 +153,7 @@ function renderMarkers() {
     else if (currentFilterRegion === "jateng") matchesRegion = region.includes("jawa tengah") || region.includes("jateng") || region.includes("diy") || region.includes("yogyakarta");
     else if (currentFilterRegion === "jatim") matchesRegion = region.includes("jawa timur") || region.includes("jatim");
 
-    let matchesElev = true;
-    if (currentFilterElevation > 0) {
-      matchesElev = (g.mdpl || 0) >= currentFilterElevation;
-    }
-
-    return matchesRegion && matchesElev;
+    return matchesRegion;
   });
 
   filtered.forEach(gunung => {
@@ -170,7 +161,7 @@ function renderMarkers() {
 
     const marker = L.marker([gunung.lat, gunung.lng], { icon: luxuryIcon });
     marker.bindPopup(buatPopupHtml(gunung), {
-      maxWidth: 290,
+      maxWidth: 270,
       className: "custom-lux-popup"
     });
 
@@ -212,26 +203,52 @@ function setupDrawerMenu() {
 function toggleMenu(e) {
   if (e) e.stopPropagation();
   const dropdown = document.getElementById("siteDropdown");
-  if (dropdown) dropdown.classList.toggle("open");
+  if (dropdown) {
+    dropdown.classList.toggle("active");
+    dropdown.classList.toggle("open");
+  }
 }
 
 function toggleMountainList(e) {
   if (e) e.stopPropagation();
   const list = document.getElementById("dropdownMountainList");
-  if (list) list.classList.toggle("open");
+  if (list) {
+    list.classList.toggle("active");
+    list.classList.toggle("open");
+  }
 }
 
 function openAboutModal(e) {
   if (e) e.stopPropagation();
   const modal = document.getElementById("aboutModal");
-  if (modal) modal.classList.add("active");
+  if (modal) {
+    modal.classList.add("active");
+    modal.classList.add("open");
+  }
   const dropdown = document.getElementById("siteDropdown");
-  if (dropdown) dropdown.classList.remove("open");
+  if (dropdown) {
+    dropdown.classList.remove("active");
+    dropdown.classList.remove("open");
+  }
 }
 
 function closeAboutModal() {
   const modal = document.getElementById("aboutModal");
-  if (modal) modal.classList.remove("active");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.classList.remove("open");
+  }
 }
+
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("siteDropdown");
+  const trigger = document.querySelector(".menu-trigger-btn");
+  if (dropdown && (dropdown.classList.contains("active") || dropdown.classList.contains("open"))) {
+    if (!dropdown.contains(e.target) && (!trigger || !trigger.contains(e.target))) {
+      dropdown.classList.remove("active");
+      dropdown.classList.remove("open");
+    }
+  }
+});
 
 document.addEventListener("DOMContentLoaded", initMap);
