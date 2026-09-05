@@ -1038,6 +1038,64 @@ const DEFAULT_DEMO_DATA = {
         "desc": "Pemandangan magis kaldera Bromo Tengger saat kabut pagi menyelimuti lembah."
       }
     ]
+  },
+  "gunung-rinjani": {
+    "id": "gunung-rinjani",
+    "slug": "rinjani",
+    "nama": "Gunung Rinjani",
+    "lokasi": "Lombok Timur / Lombok Utara, Nusa Tenggara Barat",
+    "region": "Nusa Tenggara Barat",
+    "mdpl": 3726,
+    "mdplText": "3.726 Mdpl",
+    "lat": -8.4113,
+    "lng": 116.4573,
+    "cover": "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=1200&q=85",
+    "deskripsi": "Gunung Rinjani adalah gunung berapi megah yang menjulang tinggi di Pulau Lombok, Nusa Tenggara Barat. Sebagai gunung berapi tertinggi kedua di Indonesia dengan elevasi 3.726 mdpl, Rinjani memikat pendaki dunia dengan keajaiban kaldera Danau Segara Anak berair biru kehijauan, kerucut aktif Gunung Barujari, dan pesona matahari terbit di atas lautan awan.",
+    "deskripsiTambahan": "Pemandangan kaldera Segara Anak dengan sumber air panas alami dan keindahan sabana Sembalun menjadikannya salah satu rute trekking terindah di Asia Tenggara.",
+    "tingkatKesulitan": "Sangat Menantang",
+    "estimasiWaktu": "8 - 12 Jam (3 - 4 Hari)",
+    "suhuPuncak": "3°C - 10°C",
+    "jalurPendakian": [
+      {
+        "nama": "Jalur Sembalun (Lombok Timur)",
+        "waktu": "7 - 8 Jam ke Plawangan",
+        "status": "Jalur Favorit Padang Savana"
+      },
+      {
+        "nama": "Jalur Senaru (Lombok Utara)",
+        "waktu": "7 - 9 Jam ke Plawangan",
+        "status": "Hutan Tropis & Pos Pengamatan"
+      },
+      {
+        "nama": "Jalur Torean (Lombok Utara)",
+        "waktu": "8 - 10 Jam ke Danau",
+        "status": "Lembah Teletubbies & Air Terjun Megah"
+      }
+    ],
+    "tags": [
+      "Nusa Tenggara Barat",
+      "Lombok",
+      "3.726 Mdpl",
+      "Segara Anak",
+      "Gunung Barujari",
+      "Taman Nasional"
+    ],
+    "media": [
+      {
+        "type": "image",
+        "src": "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=1200&q=85",
+        "title": "Danau Segara Anak & Gunung Barujari",
+        "category": "image",
+        "desc": "Lanskap kaldera vulkanik biru kehijauan dengan anak gunung Barujari di tengahnya."
+      },
+      {
+        "type": "image",
+        "src": "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=1200&q=85",
+        "title": "Sunrise Puncak Rinjani 3.726 Mdpl",
+        "category": "image",
+        "desc": "Pemandangan fajar spektakuler dari puncak tertinggi Nusa Tenggara Barat."
+      }
+    ]
   }
 };
 
@@ -1049,7 +1107,12 @@ function getStoredDemoData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Object.keys(parsed).length >= 10) {
+      if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+        // Pastikan Gunung Rinjani ada jika belum pernah dihapus secara eksplisit
+        if (!parsed["gunung-rinjani"] && !localStorage.getItem("rinjani_explicitly_deleted")) {
+          parsed["gunung-rinjani"] = DEFAULT_DEMO_DATA["gunung-rinjani"];
+          saveStoredDemoData(parsed);
+        }
         return parsed;
       }
     }
@@ -1069,9 +1132,18 @@ function saveStoredDemoData(data) {
 }
 
 function resetDemoDataToDefault() {
+  localStorage.removeItem("rinjani_explicitly_deleted");
   saveStoredDemoData(DEFAULT_DEMO_DATA);
   return DEFAULT_DEMO_DATA;
 }
 
 // Data Gunung yang sedang aktif
 const DATA_GUNUNG = getStoredDemoData();
+
+// Helper global untuk mengambil data gunung berdasarkan ID atau Slug
+function getGunungById(id) {
+  if (!id) return null;
+  const activeData = (typeof DATA_GUNUNG !== "undefined") ? DATA_GUNUNG : getStoredDemoData();
+  if (activeData[id]) return activeData[id];
+  return Object.values(activeData).find(m => m.id === id || m.slug === id) || null;
+}

@@ -349,6 +349,9 @@ function handleSaveMountain(e) {
 
 function confirmDeleteMountain(id, nama) {
   if (confirm(`Yakin ingin menghapus ${nama}?`)) {
+    if (id === "gunung-rinjani") {
+      localStorage.setItem("rinjani_explicitly_deleted", "true");
+    }
     delete DATA_GUNUNG[id];
     saveStoredDemoData(DATA_GUNUNG);
     showToast(`🗑️ ${nama} telah dihapus.`, "info");

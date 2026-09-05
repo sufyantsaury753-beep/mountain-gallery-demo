@@ -69,29 +69,70 @@ function resolveAssetPath(src) {
   return src;
 }
 
-function initMap() {
-  const mapBounds = [
-    [-9.50, 104.50],
-    [-5.00, 115.50]
-  ];
+const INDONESIA_BOUNDS = [
+  [-13.5, 94.0], // Barat Daya (South-West)
+  [8.0, 142.5]   // Timur Laut (North-East)
+];
 
-  // View encompassing West, Central, and East Java
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function initMap() {
+  // Map mencakup seluruh kepulauan Indonesia
   map = L.map("map", {
-    maxBounds: mapBounds,
-    maxBoundsViscosity: 0.8,
-    minZoom: 6,
-    maxZoom: 16,
+    maxBounds: INDONESIA_BOUNDS,
+    maxBoundsViscosity: 0.6,
+    minZoom: 4,
+    maxZoom: 18,
     zoomControl: true
-  }).setView([-7.45, 110.15], 7);
+  });
 
   activeLayer = mapLayers.street.addTo(map);
 
   loadAndRenderMountains();
-  setupFilters();
 
   setTimeout(() => {
     map.invalidateSize();
   }, 350);
+}
+
+function fitMapToMarkers(mountainList, animated = true) {
+  const valid = (mountainList || cachedMountains).filter(
+    m => m && typeof m.lat === "number" && typeof m.lng === "number" && !isNaN(m.lat) && !isNaN(m.lng)
+  );
+  if (valid.length === 0) {
+    if (animated) {
+      map.flyTo([-2.5, 118.0], 5, { animate: true, duration: 1.0 });
+    } else {
+      map.setView([-2.5, 118.0], 5);
+    }
+    return;
+  }
+
+  if (valid.length === 1) {
+    const single = valid[0];
+    if (animated) {
+      map.flyTo([single.lat, single.lng], 9.5, { animate: true, duration: 1.0 });
+    } else {
+      map.setView([single.lat, single.lng], 9.5);
+    }
+    return;
+  }
+
+  const bounds = L.latLngBounds(valid.map(m => [m.lat, m.lng]));
+  map.fitBounds(bounds, {
+    padding: [45, 45],
+    maxZoom: 11,
+    animate: animated,
+    duration: 1.0
+  });
 }
 
 function loadAndRenderMountains() {
@@ -101,8 +142,12 @@ function loadAndRenderMountains() {
     cachedMountains = [];
   }
 
+  renderRegionFilters();
   renderMarkers();
   setupDrawerMenu();
+
+  // Tampilkan seluruh persebaran gunung pada tampilan awal
+  fitMapToMarkers(cachedMountains, false);
 }
 
 function setBasemap(type) {
@@ -148,7 +193,7 @@ function fokusGunung(gunung, targetMarker) {
 
   map.flyTo([gunung.lat, gunung.lng], 11, {
     animate: true,
-    duration: 1.1,
+    duration: 1.0,
     easeLinearity: 0.25
   });
 
@@ -159,7 +204,7 @@ function fokusGunung(gunung, targetMarker) {
       const found = markers.find(m => m.gunungData && m.gunungData.id === gunung.id);
       if (found) found.openPopup();
     }
-  }, 1150);
+  }, 1050);
 }
 
 function selectMountainFromMenu(mountainId) {
@@ -171,7 +216,7 @@ function selectMountainFromMenu(mountainId) {
 
   const gunung = cachedMountains.find(m => m.id === mountainId || m.slug === mountainId);
   if (gunung) {
-    if (currentFilterRegion !== "all") {
+    if (currentFilterRegion !== "all" && (gunung.region || "").trim().toLowerCase() !== currentFilterRegion.trim().toLowerCase()) {
       currentFilterRegion = "all";
       document.querySelectorAll(".filter-chip").forEach(c => {
         c.classList.toggle("active", c.dataset.filter === "all");
@@ -189,13 +234,10 @@ function renderMarkers() {
   markers = [];
 
   const filtered = cachedMountains.filter(g => {
-    const region = (g.region || g.lokasi || "").toLowerCase();
-    let matchesRegion = true;
-    if (currentFilterRegion === "jabar") matchesRegion = region.includes("jawa barat") || region.includes("jabar");
-    else if (currentFilterRegion === "jateng") matchesRegion = region.includes("jawa tengah") || region.includes("jateng") || region.includes("diy") || region.includes("yogyakarta");
-    else if (currentFilterRegion === "jatim") matchesRegion = region.includes("jawa timur") || region.includes("jatim");
-
-    return matchesRegion;
+    if (currentFilterRegion === "all") return true;
+    const mountainRegion = (g.region || "").trim().toLowerCase();
+    const targetRegion = currentFilterRegion.trim().toLowerCase();
+    return mountainRegion === targetRegion;
   });
 
   filtered.forEach(gunung => {
@@ -205,7 +247,8 @@ function renderMarkers() {
     marker.gunungData = gunung;
     marker.bindPopup(buatPopupHtml(gunung), {
       maxWidth: 270,
-      className: "custom-lux-popup"
+      className: "custom-lux-popup",
+      autoPan: false
     });
 
     // Zoom & Pan to marker on click
@@ -216,25 +259,62 @@ function renderMarkers() {
     marker.addTo(map);
     markers.push(marker);
   });
+
+  return filtered;
 }
 
-function setupFilters() {
-  document.querySelectorAll(".filter-chip").forEach(chip => {
+function renderRegionFilters() {
+  const container = document.getElementById("filterChipsContainer") || document.querySelector(".filter-chips");
+  if (!container) return;
+
+  // Ekstrak semua region yang unik dari data gunung aktif
+  const regionSet = new Set();
+  cachedMountains.forEach(m => {
+    const r = (m.region || "").trim();
+    if (r) {
+      regionSet.add(r);
+    }
+  });
+
+  const regions = Array.from(regionSet).sort((a, b) => a.localeCompare(b, "id"));
+
+  // Jika region yang sedang aktif ternyata sudah terhapus, reset ke "all"
+  if (currentFilterRegion !== "all" && !regions.some(r => r.toLowerCase() === currentFilterRegion.toLowerCase())) {
+    currentFilterRegion = "all";
+  }
+
+  let html = `
+    <button type="button" class="filter-chip ${currentFilterRegion === 'all' ? 'active' : ''}" data-filter="all">
+      <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>
+      Semua
+    </button>
+  `;
+
+  regions.forEach(region => {
+    const isActive = currentFilterRegion.toLowerCase() === region.toLowerCase();
+    html += `
+      <button type="button" class="filter-chip ${isActive ? 'active' : ''}" data-filter="${escapeHtml(region)}">
+        <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        ${escapeHtml(region)}
+      </button>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  // Pasang event listener pada setiap chip filter
+  container.querySelectorAll(".filter-chip").forEach(chip => {
     chip.addEventListener("click", () => {
-      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+      container.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       currentFilterRegion = chip.dataset.filter;
-      renderMarkers();
 
-      // Smooth pan to selected province region
+      const filtered = renderMarkers();
+
       if (currentFilterRegion === "all") {
-        map.flyTo([-7.45, 110.15], 7, { animate: true, duration: 1.0 });
-      } else if (currentFilterRegion === "jabar") {
-        map.flyTo([-6.95, 107.50], 8.2, { animate: true, duration: 1.0 });
-      } else if (currentFilterRegion === "jateng") {
-        map.flyTo([-7.35, 110.15], 8.2, { animate: true, duration: 1.0 });
-      } else if (currentFilterRegion === "jatim") {
-        map.flyTo([-7.95, 112.95], 8.2, { animate: true, duration: 1.0 });
+        fitMapToMarkers(cachedMountains, true);
+      } else {
+        fitMapToMarkers(filtered, true);
       }
     });
   });
@@ -311,3 +391,15 @@ document.addEventListener("click", (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", initMap);
+
+// Sinkronisasi otomatis jika data diubah/dihapus melalui Admin CMS di tab lain
+window.addEventListener("storage", (e) => {
+  if (e.key === "mountain_gallery_demo_db_v1") {
+    if (typeof getStoredDemoData === "function") {
+      cachedMountains = Object.values(getStoredDemoData());
+      renderRegionFilters();
+      renderMarkers();
+      setupDrawerMenu();
+    }
+  }
+});

@@ -28,7 +28,10 @@ async function initGalleryPage() {
     currentMountain = getGunungById(requestedId);
   }
   if (!currentMountain && typeof DATA_GUNUNG !== "undefined") {
-    currentMountain = DATA_GUNUNG["gunung-cikuray"];
+    currentMountain = DATA_GUNUNG[requestedId] || 
+      Object.values(DATA_GUNUNG).find(m => m.id === requestedId || m.slug === requestedId) || 
+      DATA_GUNUNG["gunung-cikuray"] || 
+      Object.values(DATA_GUNUNG)[0];
   }
 
   if (!currentMountain) return;
@@ -392,7 +395,9 @@ async function setupDropdownMenu() {
       console.warn("Dropdown CloudDB fallback:", e);
     }
   }
-  if ((!mountains || mountains.length === 0) && typeof LIST_GUNUNG !== "undefined") {
+  if ((!mountains || mountains.length === 0) && typeof DATA_GUNUNG !== "undefined") {
+    mountains = Object.values(DATA_GUNUNG);
+  } else if ((!mountains || mountains.length === 0) && typeof LIST_GUNUNG !== "undefined") {
     mountains = LIST_GUNUNG;
   }
 

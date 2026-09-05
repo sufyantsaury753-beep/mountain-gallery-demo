@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mountain Gallery Demo - Peta &amp; Eksplorasi 21 Gunung Indonesia</title>
+  <title>Mountain Gallery Demo - Peta &amp; Eksplorasi Gunung Indonesia</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,7 +36,7 @@
         </div>
         <div class="brand-info">
           <h1>Mountain Gallery</h1>
-          <p>Eksplorasi 21 Puncak &amp; Jalur Pendakian Pulau Jawa</p>
+          <p>Eksplorasi Puncak &amp; Jalur Pendakian Indonesia</p>
         </div>
       </a>
 
@@ -66,7 +66,7 @@
           </span>
           <div>
             <strong>Beranda Peta</strong>
-            <small>Kembali ke peta interaktif 21 gunung</small>
+            <small>Kembali ke peta interaktif gunung Indonesia</small>
           </div>
         </a>
 
@@ -112,23 +112,11 @@
     <main class="map-section">
       <!-- Controls Bar (Filters & Basemap) -->
       <div class="map-controls-bar">
-        <!-- Filter Chips: Semua Gunung, Jawa Barat, Jawa Tengah, Jawa Timur -->
-        <div class="filter-chips">
+        <!-- Filter Chips: Wilayah Dinamis Sesuai Data Gunung (Tanpa Jumlah Angka) -->
+        <div class="filter-chips" id="filterChipsContainer">
           <button type="button" class="filter-chip active" data-filter="all">
             <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>
-            Semua (21)
-          </button>
-          <button type="button" class="filter-chip" data-filter="jabar">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            Jabar (10)
-          </button>
-          <button type="button" class="filter-chip" data-filter="jateng">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            Jateng (6)
-          </button>
-          <button type="button" class="filter-chip" data-filter="jatim">
-            <span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            Jatim (5)
+            Semua
           </button>
         </div>
 
@@ -157,7 +145,7 @@
 
     <!-- Site Footer -->
     <footer class="site-footer">
-      <div>© 2026 <strong>Mountain Gallery Demo</strong> · 21 Gunung Pilihan Pulau Jawa.</div>
+      <div>© 2026 <strong>Mountain Gallery Demo</strong> · Eksplorasi Gunung Nusantara Indonesia.</div>
       <div>Pilih pin pada peta atau gunakan menu navigasi untuk melihat detail &amp; galeri.</div>
     </footer>
   </div>
@@ -175,7 +163,7 @@
 
       <h2>Mountain Gallery</h2>
       <p>
-        <strong>Mountain Gallery</strong> adalah platform galeri interaktif berbasis peta digital yang mendokumentasikan keindahan alam, jalur pendakian, dan arsip momen berharga di 21 gunung di Pulau Jawa (Jawa Barat, Jawa Tengah, dan Jawa Timur).
+        <strong>Mountain Gallery</strong> adalah platform galeri interaktif berbasis peta digital yang mendokumentasikan keindahan alam, jalur pendakian, dan arsip momen berharga destinasi gunung di Indonesia.
       </p>
       <p>
         Dilengkapi sistem multi-layer basemap, galeri foto &amp; video HD, dan panel Admin CMS mandiri yang bisa diuji coba secara langsung.
